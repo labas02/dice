@@ -1,14 +1,18 @@
 package org.example.dice;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
+import javafx.scene.control.Button;
+import javafx.scene.layout.BorderPane;
+
 
 public class HelloController {
     @FXML
-    private Label welcomeText;
+    public Button startButton;
+    public BorderPane startMenu;
 
-    @FXML
-    protected void onHelloButtonClick() {
-        welcomeText.setText("Welcome to JavaFX Application!");
-    }
+public void throw_dice(){
+
+}
+
+
 }
