@@ -22,29 +22,14 @@ import java.util.Objects;
 
 public class HelloApplication extends Application {
     static Stage stage_true;
-    CuboidMesh box1 = new CuboidMesh(50,50,50);
-    CuboidMesh box2 = new CuboidMesh(50,50,50);
-    CuboidMesh box3 = new CuboidMesh(50,50,50);
-    CuboidMesh box4 = new CuboidMesh(50,50,50);
-    CuboidMesh box5 = new CuboidMesh(50,50,50);
-    CuboidMesh box6 = new CuboidMesh(50,50,50);
-    CuboidMesh[] ar_box = {box1,box2,box3,box4,box5,box6};
-    RotateTransition rb1x = new RotateTransition(Duration.millis(2000),box1);
-    RotateTransition rb2x = new RotateTransition(Duration.millis(2000),box2);
-    RotateTransition rb3x = new RotateTransition(Duration.millis(2000),box3);
-    RotateTransition rb4x = new RotateTransition(Duration.millis(2000),box4);
-    RotateTransition rb5x = new RotateTransition(Duration.millis(2000),box5);
-    RotateTransition rb6x = new RotateTransition(Duration.millis(2000),box6);
-    RotateTransition[] transitionR = {rb1x,rb2x,rb3x,rb4x,rb5x,rb6x};
+
 
 
     @Override
     public void start(Stage stage) throws IOException {
         stage_true = stage;
         scene_manager(1);
-        for (int i = 0; i < ar_box.length; i++) {
-            ar_box[i].setId(String.valueOf(i));
-        }
+
 
     }
 
@@ -67,10 +52,25 @@ public class HelloApplication extends Application {
                 stage_true.show();
                 break;
             case 3:
-
+                CuboidMesh box1 = new CuboidMesh(50,50,50);
+                CuboidMesh box2 = new CuboidMesh(50,50,50);
+                CuboidMesh box3 = new CuboidMesh(50,50,50);
+                CuboidMesh box4 = new CuboidMesh(50,50,50);
+                CuboidMesh box5 = new CuboidMesh(50,50,50);
+                CuboidMesh box6 = new CuboidMesh(50,50,50);
+                CuboidMesh[] ar_box = {box1,box2,box3,box4,box5,box6};
+                RotateTransition rb1x = new RotateTransition(Duration.millis(2000),box1);
+                RotateTransition rb2x = new RotateTransition(Duration.millis(2000),box2);
+                RotateTransition rb3x = new RotateTransition(Duration.millis(2000),box3);
+                RotateTransition rb4x = new RotateTransition(Duration.millis(2000),box4);
+                RotateTransition rb5x = new RotateTransition(Duration.millis(2000),box5);
+                RotateTransition rb6x = new RotateTransition(Duration.millis(2000),box6);
+                RotateTransition[] transitionR = {rb1x,rb2x,rb3x,rb4x,rb5x,rb6x};
                 TranslateTransition tb1 = new TranslateTransition(Duration.millis(2000),box1);
                 Button but = new Button();
-
+                for (int i = 0; i < ar_box.length; i++) {
+                    ar_box[i].setId(String.valueOf(i));
+                }
                 but.setText("roll");
                 but.setOnMouseClicked(mouseEvent -> {
                     HelloController.generate_values(ar_box,transitionR);
