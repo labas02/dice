@@ -1,28 +1,26 @@
 package org.example.dice;
 
-import javafx.animation.Animation;
+import javafx.animation.ParallelTransition;
 import javafx.animation.RotateTransition;
-import javafx.animation.Transition;
 import javafx.application.Application;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point3D;
-import javafx.scene.AmbientLight;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.image.Image;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.PhongMaterial;
-import javafx.scene.shape.Box;
-import javafx.scene.shape.CubicCurve;
-import javafx.scene.shape.TriangleMesh;
+import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.fxyz3d.shapes.primitives.CuboidMesh;
 
 import java.io.IOException;
+import java.util.Objects;
+import java.util.Random;
 
 
 public class HelloApplication extends Application {
@@ -33,13 +31,24 @@ public class HelloApplication extends Application {
     CuboidMesh box4 = new CuboidMesh(50f,50f,50f);
     CuboidMesh box5 = new CuboidMesh(50f,50f,50f);
     CuboidMesh box6 = new CuboidMesh(50f,50f,50f);
-    RotateTransition tb1 = new RotateTransition(Duration.millis(2000),box1);
+    CuboidMesh[] ar_box = {box1,box2,box3,box4,box5,box6};
+    RotateTransition rb1x = new RotateTransition(Duration.millis(2000),box1);
+    RotateTransition rb2x = new RotateTransition(Duration.millis(2000),box2);
+    RotateTransition rb3x = new RotateTransition(Duration.millis(2000),box3);
+    RotateTransition rb4x = new RotateTransition(Duration.millis(2000),box4);
+    RotateTransition rb5x = new RotateTransition(Duration.millis(2000),box5);
+    RotateTransition rb6x = new RotateTransition(Duration.millis(2000),box6);
+
+    RotateTransition[] transitionRX = {rb1x,rb2x,rb3x,rb4x,rb5x,rb6x};
+
+
     @Override
     public void start(Stage stage) throws IOException {
         stage_true = stage;
         scene_manager(1);
+
     }
-public Box dice1;
+
     public static void main(String[] args) {
         launch();
     }
@@ -62,15 +71,22 @@ public Box dice1;
                 Button but = new Button();
                 but.setText("roll");
                 but.setOnMouseClicked(mouseEvent -> {
-                    generate_transition();
+                    generate_values();
+                    ParallelTransition transition = new ParallelTransition(rb1x,rb2x,rb3x,rb4x,rb5x,rb6x);
+                    transition.play();
+
                 });
-                HBox hbox = new HBox(box1,box2,box3,box4,box5,box6,but);
-                box1.setTextureModeImage(getClass().getResource("pic.png").toExternalForm());
-                box2.setTextureModeImage(getClass().getResource("pic.png").toExternalForm());
-                box3.setTextureModeImage(getClass().getResource("pic.png").toExternalForm());
-                box4.setTextureModeImage(getClass().getResource("pic.png").toExternalForm());
-                box5.setTextureModeImage(getClass().getResource("pic.png").toExternalForm());
-                box6.setTextureModeImage(getClass().getResource("pic.png").toExternalForm());
+                AnchorPane anchor = new AnchorPane(box1,box2,box3,box4,box5,box6,but);
+                HBox hbox = new HBox(anchor);
+                for (CuboidMesh mesh : ar_box) {
+                    mesh.setTextureModeImage(Objects.requireNonNull(getClass().getResource("pic.png")).toExternalForm());
+                }
+
+                for(int i = 0;i<ar_box.length;i++){
+                    ar_box[i].setTranslateY(50+65*i);
+                    ar_box[i].setTranslateX(30);
+                }
+
 
                 Group root = new Group(hbox);
 
@@ -94,12 +110,73 @@ public Box dice1;
         scene_manager(3);
     }
 
-    public void generate_transition(){
-        tb1.setNode(box1);
-        tb1.setDuration(Duration.millis(2000));
-        tb1.setAxis(Point3D.ZERO.add(0,1,0));
-        tb1.setByAngle(120);
-        tb1.play();
+public void generate_values(){
+    for (CuboidMesh mesh : ar_box){
+        mesh.setRotationAxis(Rotate.Y_AXIS);
+        mesh.setRotate(0);
+        mesh.setRotationAxis(Rotate.Z_AXIS);
+        mesh.setRotate(0);
+        mesh.setRotationAxis(Rotate.X_AXIS);
+        mesh.setRotate(0);
     }
+    for (int i = 0; i < 6; i++) {
+
+        Random random = new Random();
+        int random1 = 1+random.nextInt(6);
+        System.out.println(random1);
+
+        switch(random1) {
+            case 1:
+ matrixRotateNode(transitionRX[i], Math.toRadians(0),Math.toRadians(180),Math.toRadians(270));
+
+                break;
+            case 2:
+matrixRotateNode(transitionRX[i], Math.toRadians(0),Math.toRadians(90),Math.toRadians(0));
+
+                break;
+            case 3:
+matrixRotateNode(transitionRX[i], Math.toRadians(0),Math.toRadians(0),Math.toRadians(180));
+
+                break;
+            case 4:
+                matrixRotateNode(transitionRX[i], Math.toRadians(0),Math.toRadians(180),Math.toRadians(180));
+                break;
+            case 5:
+matrixRotateNode(transitionRX[i], Math.toRadians(0),Math.toRadians(270),Math.toRadians(0));
+
+                break;
+            case 6:
+  matrixRotateNode(transitionRX[i], Math.toRadians(0),Math.toRadians(180),Math.toRadians(90));
+                break;
+        }
+
+
+
+        }
+
+
+    }
+
+    private void matrixRotateNode(RotateTransition n, double alf, double bet, double gam) {
+        double A11 = Math.cos(alf) * Math.cos(gam);
+        double A12 = Math.cos(bet) * Math.sin(alf) + Math.cos(alf) * Math.sin(bet) * Math.sin(gam);
+        double A13 = Math.sin(alf) * Math.sin(bet) - Math.cos(alf) * Math.cos(bet) * Math.sin(gam);
+        double A21 = -Math.cos(gam) * Math.sin(alf);
+        double A22 = Math.cos(alf) * Math.cos(bet) - Math.sin(alf) * Math.sin(bet) * Math.sin(gam);
+        double A23 = Math.cos(alf) * Math.sin(bet) + Math.cos(bet) * Math.sin(alf) * Math.sin(gam);
+        double A31 = Math.sin(gam);
+        double A32 = -Math.cos(gam) * Math.sin(bet);
+        double A33 = Math.cos(bet) * Math.cos(gam);
+
+        double d = Math.acos((A11 + A22 + A33 - 1d) / 2d);
+        double den = 2d * Math.sin(d);
+        Point3D p = new Point3D((A32 - A23) / den, (A13 - A31) / den, (A21 - A12) / den);
+        n.setAxis(p);
+        Random random = new Random();
+        n.setByAngle((360 * (random.nextInt(10)+4))+Math.toDegrees(d));
+    }
+
+
+
 
 }
