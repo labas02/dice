@@ -114,10 +114,6 @@ public class HelloApplication extends Application {
         scene_manager(3);
     }
 
-
-
-
-
 private void lock_dice(CuboidMesh mesh){
 mesh.getId();
 mesh.setVisible(false);

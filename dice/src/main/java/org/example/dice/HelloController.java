@@ -36,13 +36,13 @@ public class HelloController {
             mesh.setRotationAxis(Rotate.X_AXIS);
             mesh.setRotate(0);
         }
-        int[] results = new int[10];
+        int[] results = new int[6];
         for (int i = 0; i < 6; i++) {
 
             Random random = new Random();
-            int random1 = 1+random.nextInt(6);
+            int random1 = 1 + random. nextInt((6 - 1) + 1);
             results[i] = random1;
-            System.out.println(results[i]);
+            //System.out.println(results[i]);
             switch(random1) {
                 case 1:
                     matrixRotateNode(transitionRX[i], Math.toRadians(0),Math.toRadians(180),Math.toRadians(270));
@@ -67,9 +67,88 @@ public class HelloController {
 
 
         }
-
-
+        int[] dice_values = new int[6];
+    for (int i = 0;i<results.length;i++) {
+        switch(results[i]) {
+            case 1:
+                dice_values[0] += 1;
+                break;
+            case 2:
+                dice_values[1] += 1;
+                break;
+            case 3:
+                dice_values[2] += 1;
+                break;
+            case 4:
+                dice_values[3] += 1;
+                break;
+            case 5:
+                dice_values[4] += 1;
+                break;
+            case 6:
+                dice_values[5] += 1;
+                break;
+        }
+        }
+    for (int value: dice_values) {
+        System.out.println(value);
+    }
+    evaluate_trow(dice_values);
     }
 
+    private static void evaluate_trow(int[] dice_values) {
+        int tmp_score = 0;
+        int doubles = 0;
+        int[] doubles_position = new int[6];
+        //3000 points
+        if (dice_values[0] == 1&&dice_values[1] == 1&&dice_values[2] == 1&&dice_values[3] == 1&&dice_values[4] == 1&&dice_values[5] == 1) {
+            tmp_score += 3000;
+            for (int value: dice_values){
+                value = 0;
+            }
+        }
+        //counts double values
+            for (int i = 0;i<dice_values.length;i++){
+                if (dice_values[i]>=2){
+                    doubles += 1;
+                    doubles_position[i] += 1;
+                }
+            }
+            //1500 points
+            if (doubles ==3){
+                tmp_score += 1500;
+                for (int i = 0;i<doubles_position.length;i++){
+                    dice_values[i] -= 2;
+                    doubles_position[i] -= 2;
+                }
+            }
+            if (dice_values[0]==3){
+                tmp_score += 1000;
+                dice_values[0]-=0;
+            }
+            //100*dice points
+            for (int i = 0; i < dice_values.length; i++) {
+                if (i!=0) {
+                    if (dice_values[i] == 6) {
+                        tmp_score += 200 * (i + 1);
+                        dice_values[i] = 0;
+                    } else if (dice_values[i] >= 3) {
+                        tmp_score += 100 * (i + 1);
+                        dice_values[i] -= 3;
+                    }
+                }
+            }
+            //100
+        if (dice_values[0]>0){
+            tmp_score += 100*dice_values[0];
+        }
+            //50 points
+        if (dice_values[4]>0){
+            tmp_score += 50*dice_values[4];
+        }
+
+
+        System.out.println("final score: "+tmp_score);
+    }
 
 }
