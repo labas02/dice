@@ -22,15 +22,10 @@ import java.util.Objects;
 
 public class HelloApplication extends Application {
     static Stage stage_true;
-
-
-
     @Override
     public void start(Stage stage) throws IOException {
         stage_true = stage;
         scene_manager(1);
-
-
     }
 
     public static void main(String[] args) {
@@ -52,41 +47,38 @@ public class HelloApplication extends Application {
                 stage_true.show();
                 break;
             case 3:
-                CuboidMesh box1 = new CuboidMesh(50,50,50);
-                CuboidMesh box2 = new CuboidMesh(50,50,50);
-                CuboidMesh box3 = new CuboidMesh(50,50,50);
-                CuboidMesh box4 = new CuboidMesh(50,50,50);
-                CuboidMesh box5 = new CuboidMesh(50,50,50);
-                CuboidMesh box6 = new CuboidMesh(50,50,50);
-                CuboidMesh[] ar_box = {box1,box2,box3,box4,box5,box6};
-                RotateTransition rb1x = new RotateTransition(Duration.millis(2000),box1);
-                RotateTransition rb2x = new RotateTransition(Duration.millis(2000),box2);
-                RotateTransition rb3x = new RotateTransition(Duration.millis(2000),box3);
-                RotateTransition rb4x = new RotateTransition(Duration.millis(2000),box4);
-                RotateTransition rb5x = new RotateTransition(Duration.millis(2000),box5);
-                RotateTransition rb6x = new RotateTransition(Duration.millis(2000),box6);
-                RotateTransition[] transitionR = {rb1x,rb2x,rb3x,rb4x,rb5x,rb6x};
-                TranslateTransition tb1 = new TranslateTransition(Duration.millis(2000),box1);
+                CuboidMesh[] boxes = new CuboidMesh[6];
+                int size = 50;
+
+                for (int i = 0; i < boxes.length; i++) {
+                    boxes[i] = new CuboidMesh(size, size, size);
+                }
+                RotateTransition[] transitionR = new RotateTransition[6];
+                for (int i = 0;i<transitionR.length;i++){
+                    transitionR[i] =new RotateTransition(Duration.millis(2000),boxes[i]);
+                }
+
+                TranslateTransition tb1 = new TranslateTransition(Duration.millis(2000),boxes[1]);
                 Button but = new Button();
-                for (int i = 0; i < ar_box.length; i++) {
-                    ar_box[i].setId(String.valueOf(i));
+                for (int i = 0; i < boxes.length; i++) {
+                    boxes[i].setId(String.valueOf(i));
                 }
                 but.setText("roll");
                 but.setOnMouseClicked(mouseEvent -> {
-                    HelloController.generate_values(ar_box,transitionR);
-                    ParallelTransition transition = new ParallelTransition(rb1x,rb2x,rb3x,rb4x,rb5x,rb6x);
+                    HelloController.generate_values(boxes,transitionR);
+                    ParallelTransition transition = new ParallelTransition(transitionR[0],transitionR[1],transitionR[2],transitionR[3],transitionR[4],transitionR[5]);
                     transition.play();
                     tb1.play();
                 });
-                AnchorPane anchor = new AnchorPane(box1,box2,box3,box4,box5,box6,but);
+                AnchorPane anchor = new AnchorPane(boxes[0],boxes[1],boxes[2],boxes[3],boxes[4],boxes[5],but);
                 HBox hbox = new HBox(anchor);
-                for (CuboidMesh mesh : ar_box) {
+                for (CuboidMesh mesh : boxes) {
                     mesh.setTextureModeImage(Objects.requireNonNull(getClass().getResource("dice.png")).toExternalForm());
                 }
 
-                for(int i = 0;i<ar_box.length;i++){
-                    ar_box[i].setTranslateY(50+65*i);
-                    ar_box[i].setTranslateX(30);
+                for(int i = 0;i<boxes.length;i++){
+                    boxes[i].setTranslateY(50+70*i);
+                    boxes[i].setTranslateX(40);
                 }
 
                 Group root = new Group(hbox);
@@ -95,7 +87,7 @@ public class HelloApplication extends Application {
                 stage_true.setScene(scene4);
                 stage_true.setTitle("JavaFX 3D Example");
                 stage_true.show();
-                for (CuboidMesh mesh :ar_box){
+                for (CuboidMesh mesh :boxes){
                     mesh.setOnMouseClicked(mouseEvent -> lock_dice(mesh));
                 }
                 break;
