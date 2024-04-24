@@ -1,6 +1,7 @@
 package org.example.dice;
 
 import javafx.animation.RotateTransition;
+import javafx.animation.TranslateTransition;
 import javafx.geometry.Point3D;
 import javafx.scene.transform.Rotate;
 import org.fxyz3d.shapes.primitives.CuboidMesh;
@@ -9,6 +10,8 @@ import java.util.Random;
 
 public class HelloController {
     public static void matrixRotateNode(RotateTransition n, double alf, double bet, double gam) {
+        Random random = new Random();
+
         double A11 = Math.cos(alf) * Math.cos(gam);
         double A12 = Math.cos(bet) * Math.sin(alf) + Math.cos(alf) * Math.sin(bet) * Math.sin(gam);
         double A13 = Math.sin(alf) * Math.sin(bet) - Math.cos(alf) * Math.cos(bet) * Math.sin(gam);
@@ -23,11 +26,10 @@ public class HelloController {
         double den = 2d * Math.sin(d);
         Point3D p = new Point3D((A32 - A23) / den, (A13 - A31) / den, (A21 - A12) / den);
         n.setAxis(p);
-        Random random = new Random();
-        n.setByAngle((360 * (random.nextInt(5)+4))+Math.toDegrees(d));
+        n.setByAngle(360*(1+ random.nextInt(5))+Math.toDegrees(d));
     }
 
-    public static void generate_values(CuboidMesh[] ar_box, RotateTransition[] transitionRX){
+    public static void generate_values(CuboidMesh[] ar_box, RotateTransition[] transitionRX, TranslateTransition[] transitionT){
         for (CuboidMesh mesh : ar_box){
             mesh.setRotationAxis(Rotate.Y_AXIS);
             mesh.setRotate(0);
@@ -54,7 +56,9 @@ public class HelloController {
                     matrixRotateNode(transitionRX[i], Math.toRadians(0),Math.toRadians(0),Math.toRadians(180));
                     break;
                 case 4:
-                    matrixRotateNode(transitionRX[i], Math.toRadians(0),Math.toRadians(180),Math.toRadians(180));
+                    //matrixRotateNode(transitionRX[i], Math.toRadians(0),Math.toRadians(360),Math.toRadians(360));
+                    transitionRX[i].setAxis(Point3D.ZERO.add(0,1,1));
+                    transitionRX[i].setByAngle(360*(1+random.nextInt(5)));
                     break;
                 case 5:
                     matrixRotateNode(transitionRX[i], Math.toRadians(0),Math.toRadians(270),Math.toRadians(0));
@@ -69,6 +73,7 @@ public class HelloController {
         }
         int[] dice_values = new int[6];
     for (int i = 0;i<results.length;i++) {
+        Random random = new Random();
         switch(results[i]) {
             case 1:
                 dice_values[0] += 1;
@@ -89,10 +94,13 @@ public class HelloController {
                 dice_values[5] += 1;
                 break;
         }
+        transitionT[i].setToY(random.nextInt(500));
+        transitionT[i].setToX(random.nextInt(600));
         }
     for (int value: dice_values) {
         System.out.println(value);
     }
+
     evaluate_trow(dice_values);
     }
 
@@ -124,7 +132,7 @@ public class HelloController {
             }
             if (dice_values[0]==3){
                 tmp_score += 1000;
-                dice_values[0]-=0;
+                dice_values[0]-=3;
             }
             //100*dice points
             for (int i = 0; i < dice_values.length; i++) {

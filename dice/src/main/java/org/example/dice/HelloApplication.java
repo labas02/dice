@@ -9,19 +9,25 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.fxyz3d.shapes.primitives.CuboidMesh;
-
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Objects;
 
 
 public class HelloApplication extends Application {
-    static Stage stage_true;
+    static Stage stage_true;// For example
+
+
     @Override
     public void start(Stage stage) throws IOException {
         stage_true = stage;
@@ -47,6 +53,12 @@ public class HelloApplication extends Application {
                 stage_true.show();
                 break;
             case 3:
+                Image backgroundImage = new Image(getClass().getResource("background.png").toExternalForm(),1000,2000,true,true);
+                ImageView backgroundImageView = new ImageView(backgroundImage);
+
+                backgroundImageView.setSmooth(true);
+                backgroundImageView.setFitWidth(1920);
+                backgroundImageView.setFitHeight(1080);
                 CuboidMesh[] boxes = new CuboidMesh[6];
                 int size = 50;
 
@@ -57,6 +69,10 @@ public class HelloApplication extends Application {
                 for (int i = 0;i<transitionR.length;i++){
                     transitionR[i] =new RotateTransition(Duration.millis(2000),boxes[i]);
                 }
+                TranslateTransition[] transitionT =new TranslateTransition[6];
+                for (int i = 0; i < transitionT.length; i++) {
+                    transitionT[i] = new TranslateTransition(Duration.millis(2000),boxes[i]);
+                }
 
                 TranslateTransition tb1 = new TranslateTransition(Duration.millis(2000),boxes[1]);
                 Button but = new Button();
@@ -65,25 +81,29 @@ public class HelloApplication extends Application {
                 }
                 but.setText("roll");
                 but.setOnMouseClicked(mouseEvent -> {
-                    HelloController.generate_values(boxes,transitionR);
-                    ParallelTransition transition = new ParallelTransition(transitionR[0],transitionR[1],transitionR[2],transitionR[3],transitionR[4],transitionR[5]);
+                    HelloController.generate_values(boxes,transitionR,transitionT);
+                    ParallelTransition transition = new ParallelTransition(transitionR[0],transitionR[1],transitionR[2],transitionR[3],transitionR[4],transitionR[5],transitionT[0],transitionT[1],transitionT[2],transitionT[3],transitionT[4],transitionT[5]);
                     transition.play();
-                    tb1.play();
+                    MediaPlayer mediaPlayer = new MediaPlayer(new Media(getClass().getResource("stone.wav").toString()));
+                    mediaPlayer.isAutoPlay();
+                    mediaPlayer.play();
                 });
                 AnchorPane anchor = new AnchorPane(boxes[0],boxes[1],boxes[2],boxes[3],boxes[4],boxes[5],but);
+
                 HBox hbox = new HBox(anchor);
                 for (CuboidMesh mesh : boxes) {
                     mesh.setTextureModeImage(Objects.requireNonNull(getClass().getResource("dice.png")).toExternalForm());
                 }
 
                 for(int i = 0;i<boxes.length;i++){
-                    boxes[i].setTranslateY(50+70*i);
+                    boxes[i].setTranslateY(90+70*i);
                     boxes[i].setTranslateX(40);
                 }
 
-                Group root = new Group(hbox);
-
-                Scene scene4 = new Scene(root, 600, 400, Color.GREEN);
+                StackPane root = new StackPane();
+                root.getChildren().add(backgroundImageView);
+                root.getChildren().add(hbox);
+                Scene scene4 = new Scene(root, 1000, 1000);
                 stage_true.setScene(scene4);
                 stage_true.setTitle("JavaFX 3D Example");
                 stage_true.show();
