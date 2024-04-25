@@ -9,10 +9,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.fxyz3d.shapes.primitives.CuboidMesh;
@@ -23,10 +26,10 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Objects;
 
-
 public class HelloApplication extends Application {
-    static Stage stage_true;// For example
-
+    static Stage stage_true;
+    @FXML
+    CheckBox assist;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -53,6 +56,13 @@ public class HelloApplication extends Application {
                 stage_true.show();
                 break;
             case 3:
+                FXMLLoader fxmlLoader2 = new FXMLLoader(HelloApplication.class.getResource("options-singleplayer.fxml"));
+                Scene select_options;
+                select_options = new Scene(fxmlLoader2.load(), 320, 240);
+                stage_true.setScene(select_options);
+                stage_true.show();
+            break;
+                case 4:
                 Image backgroundImage = new Image(getClass().getResource("background.png").toExternalForm(),1000,2000,true,true);
                 ImageView backgroundImageView = new ImageView(backgroundImage);
 
@@ -76,12 +86,15 @@ public class HelloApplication extends Application {
 
                 TranslateTransition tb1 = new TranslateTransition(Duration.millis(2000),boxes[1]);
                 Button but = new Button();
+
                 for (int i = 0; i < boxes.length; i++) {
                     boxes[i].setId(String.valueOf(i));
                 }
+
                 but.setText("roll");
                 but.setOnMouseClicked(mouseEvent -> {
-                    HelloController.generate_values(boxes,transitionR,transitionT);
+
+                    HelloController.generate_values(boxes,transitionR,transitionT,assist.isSelected());
                     ParallelTransition transition = new ParallelTransition(transitionR[0],transitionR[1],transitionR[2],transitionR[3],transitionR[4],transitionR[5],transitionT[0],transitionT[1],transitionT[2],transitionT[3],transitionT[4],transitionT[5]);
                     transition.play();
                     MediaPlayer mediaPlayer = new MediaPlayer(new Media(getClass().getResource("stone.wav").toString()));
@@ -101,8 +114,14 @@ public class HelloApplication extends Application {
                 }
 
                 StackPane root = new StackPane();
+                GridPane score_counter = new GridPane();
+                score_counter.setMinSize(100,100);
+                score_counter.setBackground(new Background(new BackgroundFill(Color.GRAY, null, null)));
+                score_counter.setTranslateX(500);
+                score_counter.setTranslateY(50);
                 root.getChildren().add(backgroundImageView);
                 root.getChildren().add(hbox);
+                anchor.getChildren().add(score_counter);
                 Scene scene4 = new Scene(root, 1000, 1000);
                 stage_true.setScene(scene4);
                 stage_true.setTitle("JavaFX 3D Example");
@@ -111,8 +130,7 @@ public class HelloApplication extends Application {
                     mesh.setOnMouseClicked(mouseEvent -> lock_dice(mesh));
                 }
                 break;
-            case 4:
-                break;
+
             default:
                 throw new IllegalStateException("Unexpected value: " + scene);
         }
@@ -126,8 +144,11 @@ public class HelloApplication extends Application {
         scene_manager(3);
     }
 
+    public void start_game() throws IOException {
+        scene_manager(4);
+    }
+
 private void lock_dice(CuboidMesh mesh){
-mesh.getId();
 mesh.setVisible(false);
 }
 

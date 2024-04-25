@@ -29,7 +29,7 @@ public class HelloController {
         n.setByAngle(360*(1+ random.nextInt(5))+Math.toDegrees(d));
     }
 
-    public static void generate_values(CuboidMesh[] ar_box, RotateTransition[] transitionRX, TranslateTransition[] transitionT){
+    public static void generate_values(CuboidMesh[] ar_box, RotateTransition[] transitionRX, TranslateTransition[] transitionT,boolean assist){
         for (CuboidMesh mesh : ar_box){
             mesh.setRotationAxis(Rotate.Y_AXIS);
             mesh.setRotate(0);
@@ -100,9 +100,11 @@ public class HelloController {
     for (int value: dice_values) {
         System.out.println(value);
     }
-
+    //vypne našeptávač
+if(assist) {
     evaluate_trow(dice_values);
-    }
+}
+}
 
     private static void evaluate_trow(int[] dice_values) {
         int tmp_score = 0;
