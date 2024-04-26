@@ -9,6 +9,8 @@ import org.fxyz3d.shapes.primitives.CuboidMesh;
 import java.util.Random;
 
 public class HelloController {
+    public static int total_score = 0;
+
     public static void matrixRotateNode(RotateTransition n, double alf, double bet, double gam) {
         Random random = new Random();
 
@@ -159,6 +161,8 @@ if(assist) {
 
 
         System.out.println("final score: "+tmp_score);
+        total_score += tmp_score;
+        HelloApplication.show_total_score(total_score);
     }
 
 }
