@@ -8,8 +8,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -28,7 +26,8 @@ public class HelloApplication extends Application {
     @FXML
     CheckBox assist;
     static CuboidMesh[] boxes = new CuboidMesh[6];
-    static Text score_text = new Text();
+    static Text score_text_1 = new Text();
+    static Text score_text_2 = new Text();
     public static int offset_times = 0;
     public static boolean can_roll = true;
 
@@ -65,11 +64,11 @@ public class HelloApplication extends Application {
                 stage_true.show();
                 break;
             case 4:
-                Image backgroundImage = new Image(Objects.requireNonNull(getClass().getResource("background.png")).toExternalForm(), 1000, 2000, true, true);
-                ImageView backgroundImageView = new ImageView(backgroundImage);
-                backgroundImageView.setSmooth(true);
-                backgroundImageView.setFitWidth(1920);
-                backgroundImageView.setFitHeight(1080);
+               // Image backgroundImage = new Image(Objects.requireNonNull(getClass().getResource("background.png")).toExternalForm(), 1000, 2000, true, true);
+                //ImageView backgroundImageView = new ImageView(backgroundImage);
+                //backgroundImageView.setSmooth(true);
+                //backgroundImageView.setFitWidth(1920);
+                //backgroundImageView.setFitHeight(1080);
                 int size = 50;
 
                 for (int i = 0; i < boxes.length; i++) {
@@ -122,18 +121,20 @@ public class HelloApplication extends Application {
 
                 combination_text.setTranslateX(20);
                 combination_text.setTranslateY(50);
-                AnchorPane anchor = new AnchorPane(boxes[0], boxes[1], boxes[2], boxes[3], boxes[4], boxes[5], but);
                 Button end_turn = new Button("end turn");
+                AnchorPane anchor = new AnchorPane(boxes[0], boxes[1], boxes[2], boxes[3], boxes[4], boxes[5], but,end_turn);
                 end_turn.setOnMouseClicked(mouseEvent -> HelloController.setEnd_turn());
                 end_turn.setTranslateY(20);
-                score_text.setText("total score: 0");
-                score_text.setStyle("-fx-font:25 arial;");
+                score_text_1.setText("total score: 0");
+                score_text_1.setStyle("-fx-font:15 arial;");
+                score_text_2.setText("total score: 0");
+                score_text_2.setStyle("-fx-font:15 arial;");
+                score_text_2.setTranslateX(110);
                 StackPane root = new StackPane();
                 GridPane score_counter = new GridPane();
-                score_counter.getChildren().addAll(score_text, combination_text, end_turn);
+                score_counter.getChildren().addAll(score_text_1,score_text_2, combination_text);
 
-                score_counter.setMaxSize(250, 300);
-                score_counter.setMinSize(200, 200);
+                score_counter.setMinSize(350, 400);
                 anchor.setBackground(new Background(new BackgroundFill(Color.GREEN, null, null)));
                 score_counter.setBackground(new Background(new BackgroundFill(Color.GRAY, null, null)));
                 score_counter.setTranslateX(800);
@@ -142,7 +143,7 @@ public class HelloApplication extends Application {
                 anchor.getChildren().add(score_counter);
                 root.getChildren().add(anchor);
 
-                Scene scene4 = new Scene(root, 1200, 800);
+                Scene scene4 = new Scene(root, 1500, 1000);
                 stage_true.setScene(scene4);
                 stage_true.setTitle("JavaFX 3D Example");
                 stage_true.show();
@@ -175,11 +176,12 @@ public class HelloApplication extends Application {
         mesh.setDisable(true);
         mesh.setTranslateX(50 + 50 * offset_times);
         mesh.setTranslateY(600);
-        HelloController.lock_dice(Integer.parseInt(mesh.getId()), 1);
+        HelloController.lock_dice(Integer.parseInt(mesh.getId()));
     }
 
-    public static void show_total_score(int value) {
-        score_text.setText("total Score: " + value);
+    public static void show_total_score(int value_1,int value_2) {
+        score_text_1.setText("total Score: " + value_1);
+        score_text_2.setText("total Score: " + value_2);
     }
 
     public static void change_combination_text(String s) {

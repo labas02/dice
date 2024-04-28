@@ -11,10 +11,13 @@ import java.util.Random;
 public class HelloController {
     public static int[] dice_values = new int[6];
     public static int[] results = new int[6];
-    public static int total_score = 0;
+    public static int total_score_1 = 0;
+    public static int total_score_2 = 0;
+    public static int player;
     public static int[] dice_p_arr = new int[6];
     public static boolean[] locked_dice = new boolean[6];
     public static boolean assist_1;
+    public static int turn_score = 0;
 
     public static void matrixRotateNode(RotateTransition n, double alf, double bet, double gam) {
         Random random = new Random();
@@ -40,7 +43,7 @@ public class HelloController {
         assist_1 = assist;
         dice_values = new int[6];
         for (int i = 0; i < ar_box.length; i++) {
-            if (locked_dice[i] == false) {
+            if (!locked_dice[i]) {
                 ar_box[i].setRotationAxis(Rotate.Y_AXIS);
                 ar_box[i].setRotate(0);
                 ar_box[i].setRotationAxis(Rotate.Z_AXIS);
@@ -51,7 +54,7 @@ public class HelloController {
         }
         results = new int[6];
         for (int i = 0; i < 6; i++) {
-            if (locked_dice[i] == false) {
+            if (!locked_dice[i]) {
                 Random random = new Random();
                 int random1 = 1 + random.nextInt((6 - 1) + 1);
                 results[i] = random1;
@@ -82,7 +85,7 @@ public class HelloController {
         }
 
         for (int i = 0; i < results.length; i++) {
-            if (locked_dice[i] == false) {
+            if (!locked_dice[i]) {
 
                 Random random = new Random();
                 switch (results[i]) {
@@ -182,14 +185,12 @@ public class HelloController {
     }
 
     private static void print_combination(int[] dice_values, boolean determines_roll, boolean end_turn) {
-        String combinations = "";
+        StringBuilder combinations = new StringBuilder();
         int doubles = 0;
         int[] doubles_position = new int[6];
         //3000 points
         if (dice_values[0] == 1 && dice_values[1] == 1 && dice_values[2] == 1 && dice_values[3] == 1 && dice_values[4] == 1 && dice_values[5] == 1) {
-            combinations = combinations + "1 + 2 + 3 + 4 + 5 + 6: 3000\n";
-            for (int value : dice_values) {
-            }
+            combinations.append("1 + 2 + 3 + 4 + 5 + 6: 3000\n");
         }
         //counts double values
         for (int i = 0; i < dice_values.length; i++) {
@@ -200,43 +201,41 @@ public class HelloController {
         }
         //1500 points
         if (doubles == 3) {
-            combinations = combinations + "3 doubles: 1500\n";
-            for (int i = 0; i < doubles_position.length; i++) {
+            combinations.append("3 doubles: 1500\n");
 
-            }
         }
         if (dice_values[0] == 3) {
-            combinations = combinations + "1 + 1 + 1: 1000";
+            combinations.append("1 + 1 + 1: 1000\n");
         }
         //100*dice points
         for (int i = 0; i < dice_values.length; i++) {
             if (i != 0) {
                 if (dice_values[i] == 6) {
-                    combinations = combinations + "2 three numbers:" + 200 * (i + 1) + "\n";
+                    combinations.append("2 three numbers:").append(200 * (i + 1)).append("\n");
                 } else if (dice_values[i] >= 3) {
-                    combinations = combinations + "three numbers:" + 100 * (i + 1) + "\n";
+                    combinations.append("three numbers:").append(100 * (i + 1)).append("\n");
 
                 }
             }
         }
         //100
         if (dice_values[0] > 0) {
-            combinations = combinations + "number 1:" + 100 * dice_values[0] + "\n";
+            combinations.append("number 1:").append(100 * dice_values[0]).append("\n");
         }
         //50 points
         if (dice_values[4] > 0) {
-            combinations = combinations + "number 5:" + 50 * dice_values[4] + "\n";
+            combinations.append("number 5:").append(50 * dice_values[4]).append("\n");
         }
 
         if (assist_1 && !determines_roll) {
-            HelloApplication.change_combination_text(combinations);
+            HelloApplication.change_combination_text(combinations.toString());
         }
-        if (determines_roll && combinations != "") {
+        if (determines_roll && combinations.toString() != "") {
             HelloApplication.can_roll = true;
         } else {
             HelloApplication.can_roll = false;
         }
-        if (!determines_roll && combinations == "" && end_turn) {
+        if (!determines_roll && combinations.toString() == "" && end_turn) {
             setEnd_turn();
         }
 
@@ -244,20 +243,37 @@ public class HelloController {
 
     public static void setEnd_turn() {
         evaluate_trow(dice_p_arr);
-        total_score += tmp_score;
-        HelloApplication.show_total_score(total_score);
+        if (player == 1) {
+            total_score_1 += tmp_score;
+        } else {
+            total_score_2 += tmp_score;
+        }
+        if (tmp_score == 0){
+            point_loss(turn_score);
+        }
+        turn_score += tmp_score;
+        HelloApplication.show_total_score(total_score_1, total_score_2);
         dice_p_arr = new int[6];
         HelloApplication.reset_cubes();
+        if (player == 1) {
+            player = 2;
+        } else player = 1;
+        turn_score = 0;
     }
 
     public static void tmp_dice_value() {
         evaluate_trow(dice_p_arr);
-        total_score += tmp_score;
-        HelloApplication.show_total_score(total_score);
+        if (player == 1) {
+            total_score_1 += tmp_score;
+        } else {
+            total_score_2 += tmp_score;
+        }
+        turn_score += tmp_score;
+        HelloApplication.show_total_score(total_score_1, total_score_2);
         dice_p_arr = new int[6];
     }
 
-    public static void lock_dice(int i, int value) {
+    public static void lock_dice(int i) {
         locked_dice[i] = true;
         switch (results[i]) {
             case 1:
@@ -285,6 +301,13 @@ public class HelloController {
         }
         print_combination(dice_p_arr, true, false);
 
+    }
+    public static void point_loss(int points){
+        if (player == 1){
+            total_score_1 -= points;
+        }else {
+            total_score_2 -= points;
+        }
     }
 
 }
