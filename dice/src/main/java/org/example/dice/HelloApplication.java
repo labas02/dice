@@ -1,6 +1,5 @@
 package org.example.dice;
 
-import javafx.animation.ParallelTransition;
 import javafx.animation.RotateTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
@@ -9,13 +8,13 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.fxyz3d.shapes.primitives.CuboidMesh;
@@ -25,10 +24,13 @@ import java.util.Objects;
 
 public class HelloApplication extends Application {
     static Stage stage_true;
+    static Text combination_text = new Text(" possible\n combinations:");
     @FXML
     CheckBox assist;
-    static TextArea score_text = new TextArea();
-    int offset_times = 0;
+    static CuboidMesh[] boxes = new CuboidMesh[6];
+    static Text score_text = new Text();
+    public static int offset_times = 0;
+    public static boolean can_roll = true;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -68,7 +70,6 @@ public class HelloApplication extends Application {
                 backgroundImageView.setSmooth(true);
                 backgroundImageView.setFitWidth(1920);
                 backgroundImageView.setFitHeight(1080);
-                CuboidMesh[] boxes = new CuboidMesh[6];
                 int size = 50;
 
                 for (int i = 0; i < boxes.length; i++) {
@@ -92,12 +93,21 @@ public class HelloApplication extends Application {
 
                 but.setText("roll");
                 but.setOnMouseClicked(mouseEvent -> {
-                    HelloController.generate_values(boxes, transitionR, transitionT, assist.isSelected());
-                    ParallelTransition transition = new ParallelTransition(transitionR[0], transitionR[1], transitionR[2], transitionR[3], transitionR[4], transitionR[5], transitionT[0], transitionT[1], transitionT[2], transitionT[3], transitionT[4], transitionT[5]);
-                    transition.play();
-                    MediaPlayer mediaPlayer = new MediaPlayer(new Media(Objects.requireNonNull(getClass().getResource("stone.wav")).toString()));
-                    mediaPlayer.isAutoPlay();
-                    mediaPlayer.play();
+                    if (can_roll) {
+                        can_roll = false;
+                        HelloController.generate_values(boxes, transitionR, transitionT, assist.isSelected());
+                        for (int i = 0; i < 6; i++) {
+                            if (HelloController.locked_dice[i] == false) {
+                                transitionR[i].play();
+                                transitionT[i].play();
+                            }
+                        }
+
+                        MediaPlayer mediaPlayer = new MediaPlayer(new Media(Objects.requireNonNull(getClass().getResource("stone.wav")).toString()));
+                        mediaPlayer.isAutoPlay();
+                        mediaPlayer.play();
+                        HelloController.tmp_dice_value();
+                    }
                 });
 
                 for (CuboidMesh mesh : boxes) {
@@ -110,23 +120,29 @@ public class HelloApplication extends Application {
                 }
 
 
+                combination_text.setTranslateX(20);
+                combination_text.setTranslateY(50);
                 AnchorPane anchor = new AnchorPane(boxes[0], boxes[1], boxes[2], boxes[3], boxes[4], boxes[5], but);
-
-                score_text.setText("text");
+                Button end_turn = new Button("end turn");
+                end_turn.setOnMouseClicked(mouseEvent -> HelloController.setEnd_turn());
+                end_turn.setTranslateY(20);
+                score_text.setText("total score: 0");
+                score_text.setStyle("-fx-font:25 arial;");
                 StackPane root = new StackPane();
                 GridPane score_counter = new GridPane();
+                score_counter.getChildren().addAll(score_text, combination_text, end_turn);
 
-                score_counter.setMinSize(100, 100);
+                score_counter.setMaxSize(250, 300);
+                score_counter.setMinSize(200, 200);
                 anchor.setBackground(new Background(new BackgroundFill(Color.GREEN, null, null)));
                 score_counter.setBackground(new Background(new BackgroundFill(Color.GRAY, null, null)));
                 score_counter.setTranslateX(800);
                 score_counter.setTranslateY(50);
 
-                score_counter.getChildren().add(score_text);
                 anchor.getChildren().add(score_counter);
                 root.getChildren().add(anchor);
 
-                Scene scene4 = new Scene(root, 1000, 1000);
+                Scene scene4 = new Scene(root, 1200, 800);
                 stage_true.setScene(scene4);
                 stage_true.setTitle("JavaFX 3D Example");
                 stage_true.show();
@@ -158,12 +174,28 @@ public class HelloApplication extends Application {
         offset_times += 1;
         mesh.setDisable(true);
         mesh.setTranslateX(50 + 50 * offset_times);
-        mesh.setTranslateY(800);
-
+        mesh.setTranslateY(600);
+        HelloController.lock_dice(Integer.parseInt(mesh.getId()), 1);
     }
 
     public static void show_total_score(int value) {
-        score_text.setText(String.valueOf(value));
+        score_text.setText("total Score: " + value);
     }
 
+    public static void change_combination_text(String s) {
+        combination_text.setText(s);
+    }
+
+    public static void reset_cubes() {
+        for (int i = 0; i < boxes.length; i++) {
+            boxes[i].setTranslateY(90 + 70 * i);
+            boxes[i].setTranslateX(40);
+            offset_times = 0;
+            for (CuboidMesh box : boxes) {
+                box.setDisable(false);
+                HelloController.locked_dice = new boolean[6];
+            }
+
+        }
+    }
 }
