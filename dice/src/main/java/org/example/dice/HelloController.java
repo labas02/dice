@@ -254,11 +254,13 @@ public class HelloController {
         turn_score += tmp_score;
         HelloApplication.show_total_score(total_score_1, total_score_2);
         dice_p_arr = new int[6];
-        HelloApplication.reset_cubes();
+
         if (player == 1) {
             player = 2;
         } else player = 1;
         turn_score = 0;
+        HelloApplication.reset_cubes();
+        HelloApplication.can_roll = true;
     }
 
     public static void tmp_dice_value() {
