@@ -23,12 +23,13 @@ import org.fxyz3d.shapes.primitives.CuboidMesh;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Random;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class HelloApplication extends Application {
     public int player_count;
     public Label winner;
-    private GridPane score_counter = new GridPane();
-    private StackPane root = new StackPane();
+    private final GridPane score_counter = new GridPane();
+    private final StackPane root = new StackPane();
     public AnchorPane anchor = new AnchorPane();
     public static Button end_turn = new Button("end turn");
     public static Button but = new Button("roll");
@@ -78,11 +79,6 @@ public class HelloApplication extends Application {
                 stage_true.show();
                 break;
             case 4:
-                // Image backgroundImage = new Image(Objects.requireNonNull(getClass().getResource("background.png")).toExternalForm(), 1000, 2000, true, true);
-                //ImageView backgroundImageView = new ImageView(backgroundImage);
-                //backgroundImageView.setSmooth(true);
-                //backgroundImageView.setFitWidth(1920);
-                //backgroundImageView.setFitHeight(1080);
 
                 for (int i = 0; i < boxes.length; i++) {
                     boxes[i] = new CuboidMesh(size, size, size);
@@ -179,11 +175,7 @@ public class HelloApplication extends Application {
                 }
                 break;
             case 5:
-                // Image backgroundImage = new Image(Objects.requireNonNull(getClass().getResource("background.png")).toExternalForm(), 1000, 2000, true, true);
-                //ImageView backgroundImageView = new ImageView(backgroundImage);
-                //backgroundImageView.setSmooth(true);
-                //backgroundImageView.setFitWidth(1920);
-                //backgroundImageView.setFitHeight(1080);
+
 
                 for (int i = 0; i < boxes.length; i++) {
                     boxes[i] = new CuboidMesh(size, size, size);
@@ -240,7 +232,6 @@ public class HelloApplication extends Application {
 
                 combination_text.setTranslateX(20);
                 combination_text.setTranslateY(50);
-                end_turn = new Button("end turn");
                 anchor = new AnchorPane(boxes[0], boxes[1], boxes[2], boxes[3], boxes[4], boxes[5], but, end_turn);
                 end_turn.setOnMouseClicked(mouseEvent -> {
                     try {
@@ -255,8 +246,6 @@ public class HelloApplication extends Application {
                 score_text_2.setText("total score: 0");
                 score_text_2.setStyle("-fx-font:15 arial;");
                 score_text_2.setTranslateX(110);
-                root = new StackPane();
-                score_counter = new GridPane();
                 score_counter.getChildren().addAll(score_text_1, score_text_2, combination_text);
 
                 score_counter.setMinSize(350, 400);
@@ -265,7 +254,6 @@ public class HelloApplication extends Application {
                 score_counter.setTranslateX(800);
                 score_counter.setTranslateY(50);
 
-                VBox score_player = new VBox();
                 anchor.getChildren().add(score_counter);
                 root.getChildren().add(anchor);
 
@@ -362,24 +350,30 @@ public class HelloApplication extends Application {
             }
 
         }
+
         if (player == 2){
             generate_values(boxes, transitionR, transitionT, assist.isSelected());
+            RotateTransition rot = new RotateTransition();
+            rot.setDuration(Duration.millis(2000));
+            rot.setNode(boxes[1]);
+            rot.setOnFinished(actionEvent -> {
+                try {
+                    reset_cubes();
+                } catch (IOException | InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            });
         for (int i = 0; i < 6; i++) {
             if (!locked_dice[i]) {
-                transitionT[i].setOnFinished(event -> {
-                    try {
-                        reset_cubes();
-                    } catch (IOException | InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
                 transitionR[i].play();
                 transitionT[i].play();
             }
         }
+rot.play();
        setEnd_turn(dice_values);
         }
     }
+
     public  int[] dice_values = new int[6];
     public  int[] results = new int[6];
     public  int total_score_1 = 0;
