@@ -531,6 +531,9 @@ public class HelloApplication extends Application {
         n.setByAngle(360 * (1 + random.nextInt(5)) + Math.toDegrees(d));
     }
 
+    public int[] positionsY = new int[6];
+    public int[] positionsX = new int[6];
+
     public void generate_values(CuboidMesh[] ar_box, RotateTransition[] transitionRX, TranslateTransition[] transitionT, boolean assist) throws IOException, InterruptedException {
         assist_1 = assist;
         dice_values = new int[6];
@@ -577,6 +580,7 @@ public class HelloApplication extends Application {
         }
 
         for (int i = 0; i < results.length; i++) {
+
             if (!locked_dice[i]) {
 
                 Random random = new Random();
@@ -600,8 +604,28 @@ public class HelloApplication extends Application {
                         dice_values[5] += 1;
                         break;
                 }
-                transitionT[i].setToY(random.nextInt(500));
-                transitionT[i].setToX(random.nextInt(600));
+                int randomY = random.nextInt(500)+30;
+                int randomX = random.nextInt(600)+30;
+            boolean is_overlaping = true;
+                while (is_overlaping) {
+                    is_overlaping = false;
+                    for (int j = 0; j < 6; j++) {
+                        if (positionsY[j] + 50 < randomY + 50 && positionsY[j] + 50 > randomY - 50 ||
+                                positionsY[j] - 50 > randomY - 50 && positionsY[j] - 50 < randomY + 50 &&
+                                        positionsX[j] + 50 < randomX + 50 && positionsX[j] + 50 > randomX - 50 ||
+                                positionsX[j] - 50 > randomX - 50 && positionsX[j] - 50 < randomX + 50) {
+                            randomY = random.nextInt(500) + 30;
+                            randomX = random.nextInt(600) + 30;
+                            is_overlaping = true;
+                        }
+                    }
+                }
+
+                positionsY[i] = randomY;
+                positionsX[i] = randomX;
+                transitionT[i].setToY(randomY);
+                transitionT[i].setToX(randomX);
+
             }
         }
 
