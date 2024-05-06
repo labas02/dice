@@ -4,6 +4,7 @@ module org.example.dice {
     requires org.fxyz3d.core;
     requires java.desktop;
     requires javafx.media;
+    requires json.simple;
 
 
     opens org.example.dice to javafx.fxml;
