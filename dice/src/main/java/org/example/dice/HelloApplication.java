@@ -17,13 +17,10 @@ import javafx.scene.transform.Rotate;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.fxyz3d.shapes.primitives.CuboidMesh;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Objects;
 import java.util.Random;
 
@@ -364,6 +361,45 @@ public class HelloApplication extends Application {
                 stage_true.setScene(leaderboard);
                 stage_true.show();
                 break;
+            case 9:
+                player_count = Integer.parseInt(players_playing.getText());
+                Text[] texts = new Text[player_count];
+                TextArea[] textAreas = new TextArea[player_count];
+                VBox name_anchor = new VBox();
+                ScrollPane scroll_name = new ScrollPane();
+                for (int i = 0; i < player_count; i++) {
+                    texts[i] = new Text();
+                    textAreas[i] = new TextArea();
+                    textAreas[i].setTranslateX(150);
+                    textAreas[i].setMaxSize(200,10);
+                    textAreas[i].setId(String.valueOf(i));
+                    texts[i].setTranslateX(100);
+                    texts[i].setTranslateY(30);
+                    texts[i].setText("player"+i);
+
+                    name_anchor.getChildren().addAll(texts[i],textAreas[i]);
+                }
+                Button name_but = new Button();
+                name_but.setOnMouseClicked(mouseEvent -> {
+                    for (int i = 0; i < player_count; i++) {
+                        player_names[i] = textAreas[i].getText();
+                    }
+                    try {
+                        multi_player();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                name_but.setText("start game");
+                name_anchor.getChildren().add(name_but);
+                scroll_name.setContent(name_anchor);
+                StackPane new_root = new StackPane();
+                new_root.getChildren().add(scroll_name);
+                Scene scene6 = new Scene(new_root, 1500, 1000);
+                stage_true.setScene(scene6);
+                stage_true.setTitle("JavaFX 3D Example");
+                stage_true.show();
+                break;
             default:
                 throw new IllegalStateException("Unexpected value: " + scene);
         }
@@ -398,6 +434,9 @@ public class HelloApplication extends Application {
     public void leaderboard() throws IOException {
         scene_manager(8, 0);
     }
+    public void name_input() throws IOException {
+        scene_manager(9,0);
+    }
 
     private void write_winner() throws IOException {
         FileWriter fw = new FileWriter("leaderboard.csv", true);
@@ -421,7 +460,7 @@ public class HelloApplication extends Application {
             if (total_score[i] > 10000) {
                 end_game(i);
             }
-            player_scores[i].setText("total score: " + total_score[i]);
+            player_scores[i].setText(player_names[i] + "  total score: " + total_score[i]);
         }
     }
 

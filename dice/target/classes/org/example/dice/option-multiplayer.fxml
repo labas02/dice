@@ -11,7 +11,7 @@
    <children>
       <AnchorPane prefHeight="439.0" prefWidth="600.0" VBox.vgrow="ALWAYS">
          <children>
-            <Button layoutX="286.0" layoutY="286.0" mnemonicParsing="false" onAction="#multi_player" text="Button" />
+            <Button layoutX="286.0" layoutY="286.0" mnemonicParsing="false" onMouseClicked="#name_input" text="Button" />
             <Label layoutX="143.0" layoutY="178.0" text="player count 1-10" />
             <TextField fx:id="players_playing" layoutX="264.0" layoutY="174.0" />
             <CheckBox fx:id="assist" layoutX="254.0" layoutY="216.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="81.0" text="assist" />
