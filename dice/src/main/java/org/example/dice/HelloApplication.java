@@ -7,9 +7,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point3D;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -23,26 +21,29 @@ import org.fxyz3d.shapes.primitives.CuboidMesh;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Random;
-import java.util.concurrent.ScheduledExecutorService;
 
 public class HelloApplication extends Application {
-    public int player_count;
+
+    public TextField players_playing;
+    boolean against_bot;
+    public int player_count = 0;
     public Label winner;
-    private final GridPane score_counter = new GridPane();
+    private final GridPane naseptavac = new GridPane();
     private final StackPane root = new StackPane();
     public AnchorPane anchor = new AnchorPane();
     public static Button end_turn = new Button("end turn");
     public static Button but = new Button("roll");
     public static TranslateTransition[] transitionT = new TranslateTransition[6];
     public static RotateTransition[] transitionR = new RotateTransition[6];
+    public Text[] player_scores = new Text[10];
+    public int[] total_score = new int[10];
     int size = 50;
     static Stage stage_true;
     static Text combination_text = new Text(" possible\n combinations:");
     @FXML
     CheckBox assist;
     static CuboidMesh[] boxes = new CuboidMesh[6];
-    static Text score_text_1 = new Text();
-    static Text score_text_2 = new Text();
+
     public static int offset_times = 0;
     public static boolean can_roll = true;
 
@@ -79,7 +80,11 @@ public class HelloApplication extends Application {
                 stage_true.show();
                 break;
             case 4:
-
+                for (int i = 0; i < 2; i++) {
+                    total_score[i] = 0;
+                    player_scores[i] = new Text();
+                }
+                against_bot = true;
                 for (int i = 0; i < boxes.length; i++) {
                     boxes[i] = new CuboidMesh(size, size, size);
                 }
@@ -144,20 +149,20 @@ public class HelloApplication extends Application {
                     }
                 });
                 end_turn.setTranslateY(20);
-                score_text_1.setText("total score: 0");
-                score_text_1.setStyle("-fx-font:15 arial;");
-                score_text_2.setText("total score: 0");
-                score_text_2.setStyle("-fx-font:15 arial;");
-                score_text_2.setTranslateX(110);
-                score_counter.getChildren().addAll(score_text_1, score_text_2, combination_text);
+                player_scores[0].setText("total score: 0");
+                player_scores[0].setStyle("-fx-font:15 arial;");
+                player_scores[1].setText("total score: 0");
+                player_scores[1].setStyle("-fx-font:15 arial;");
+                player_scores[1].setTranslateY(150);
+                naseptavac.getChildren().addAll(player_scores[0], player_scores[1], combination_text);
 
-                score_counter.setMinSize(350, 400);
+                naseptavac.setMinSize(350, 400);
                 anchor.setBackground(new Background(new BackgroundFill(Color.GREEN, null, null)));
-                score_counter.setBackground(new Background(new BackgroundFill(Color.GRAY, null, null)));
-                score_counter.setTranslateX(800);
-                score_counter.setTranslateY(50);
+                naseptavac.setBackground(new Background(new BackgroundFill(Color.GRAY, null, null)));
+                naseptavac.setTranslateX(800);
+                naseptavac.setTranslateY(50);
 
-                anchor.getChildren().add(score_counter);
+                anchor.getChildren().add(naseptavac);
                 root.getChildren().add(anchor);
 
                 Scene scene4 = new Scene(root, 1500, 1000);
@@ -175,7 +180,13 @@ public class HelloApplication extends Application {
                 }
                 break;
             case 5:
-
+                assist_1 = assist.isSelected();
+                for (int i = 0; i < player_count; i++) {
+                    total_score[i] = 0;
+                    player_scores[i] = new Text();
+                }
+                player_count = Integer.parseInt(players_playing.getText());
+against_bot = false;
 
                 for (int i = 0; i < boxes.length; i++) {
                     boxes[i] = new CuboidMesh(size, size, size);
@@ -232,6 +243,31 @@ public class HelloApplication extends Application {
 
                 combination_text.setTranslateX(20);
                 combination_text.setTranslateY(50);
+                System.out.println(player_count);
+                AnchorPane[] player_box = new AnchorPane[player_count];
+                VBox players = new VBox();
+                players.setMaxSize(60,60);
+                ScrollPane leader_board = new ScrollPane();
+                leader_board.setMinSize(200,200);
+                leader_board.setMaxSize(2000,200);
+                leader_board.setBackground(new Background(new BackgroundFill(Color.GREY, null, null)));
+                leader_board.setTranslateX(800);
+                leader_board.setTranslateY(0);
+
+                for (int i = 0; i < player_count; i++) {
+                    player_scores[i] = new Text();
+                    player_scores[i].setText("player");
+                    player_scores[i].setTranslateY(25);
+                    player_scores[i].setTranslateX(5);
+                    player_box[i] = new AnchorPane();
+                    player_box[i].setMinSize(150,50);
+                    player_box[i].setBackground(new Background(new BackgroundFill(Color.GREY, null, null)));
+                    player_box[i].getChildren().add(player_scores[i]);
+                    players.getChildren().add(player_box[i]);
+                }
+
+            leader_board.setContent(players);
+
                 anchor = new AnchorPane(boxes[0], boxes[1], boxes[2], boxes[3], boxes[4], boxes[5], but, end_turn);
                 end_turn.setOnMouseClicked(mouseEvent -> {
                     try {
@@ -241,26 +277,23 @@ public class HelloApplication extends Application {
                     }
                 });
                 end_turn.setTranslateY(20);
-                score_text_1.setText("total score: 0");
-                score_text_1.setStyle("-fx-font:15 arial;");
-                score_text_2.setText("total score: 0");
-                score_text_2.setStyle("-fx-font:15 arial;");
-                score_text_2.setTranslateX(110);
-                score_counter.getChildren().addAll(score_text_1, score_text_2, combination_text);
-
-                score_counter.setMinSize(350, 400);
+                naseptavac.setMinSize(350, 400);
                 anchor.setBackground(new Background(new BackgroundFill(Color.GREEN, null, null)));
-                score_counter.setBackground(new Background(new BackgroundFill(Color.GRAY, null, null)));
-                score_counter.setTranslateX(800);
-                score_counter.setTranslateY(50);
+                naseptavac.setBackground(new Background(new BackgroundFill(Color.GRAY, null, null)));
+                naseptavac.setTranslateX(800);
+                naseptavac.setTranslateY(200);
+                if (assist.isSelected()) {
+                    naseptavac.getChildren().add(combination_text);
+                }
 
-                anchor.getChildren().add(score_counter);
+                anchor.getChildren().addAll(naseptavac,leader_board);
                 root.getChildren().add(anchor);
 
                 Scene scene5 = new Scene(root, 1500, 1000);
                 stage_true.setScene(scene5);
                 stage_true.setTitle("JavaFX 3D Example");
                 stage_true.show();
+
                 for (CuboidMesh mesh : boxes) {
                     mesh.setOnMouseClicked(mouseEvent -> {
                         try {
@@ -295,9 +328,6 @@ public class HelloApplication extends Application {
         scene_manager(2,0);
 
     }
-    public void set_player_count(){
-        player_count = 10;
-    }
     @FXML
     public void single_player() throws IOException {
         scene_manager(3,0);
@@ -325,14 +355,14 @@ public class HelloApplication extends Application {
         lock_dice(Integer.parseInt(mesh.getId()));
     }
 
-    public void show_total_score(int value_1, int value_2) throws IOException {
-        if(value_1>10000){
-            end_game(1);
-        } else if (value_2>10000) {
-            end_game(2);
+    public void show_total_score() throws IOException {
+
+        for (int i = 0; i < player_count; i++) {
+            if (total_score[i]>10000){
+                end_game(i);
+            }
+            player_scores[i].setText("total score: " + total_score[i]);
         }
-        score_text_1.setText("total Score: " + value_1);
-        score_text_2.setText("total Score: " + value_2);
     }
 
     public void change_combination_text(String s) {
@@ -351,7 +381,7 @@ public class HelloApplication extends Application {
 
         }
 
-        if (player == 2){
+        if (player == 2 && against_bot){
             generate_values(boxes, transitionR, transitionT, assist.isSelected());
             RotateTransition rot = new RotateTransition();
             rot.setDuration(Duration.millis(2000));
@@ -376,9 +406,7 @@ rot.play();
 
     public  int[] dice_values = new int[6];
     public  int[] results = new int[6];
-    public  int total_score_1 = 0;
-    public  int total_score_2 = 0;
-    public  int player = 1;
+    public  int player = 0;
     public  int[] dice_p_arr = new int[6];
     public  boolean[] locked_dice = new boolean[6];
     public  boolean assist_1;
@@ -489,7 +517,7 @@ rot.play();
 
     public static int tmp_score;
 
-    private static void evaluate_trow(int[] dice_values) {
+    private static void evaluate_throw(int[] dice_values) {
         tmp_score = 0;
         int doubles = 0;
         int[] doubles_position = new int[6];
@@ -607,36 +635,38 @@ rot.play();
     }
 
     public void setEnd_turn(int[] array) throws IOException, InterruptedException {
-        evaluate_trow(array);
-        if (player == 1) {
-            total_score_1 += tmp_score;
-        } else {
-            total_score_2 += tmp_score;
-        }
+        evaluate_throw(array);
+       total_score[player] += tmp_score;
+
         if (tmp_score == 0){
             point_loss(turn_score);
         }
         turn_score += tmp_score;
-        show_total_score(total_score_1, total_score_2);
+        show_total_score();
         dice_p_arr = new int[6];
-
-        if (player == 1) {
-            player = 2;
-        } else player = 1;
+if (against_bot) {
+    if (player == 0) {
+        player = 1;
+    } else player = 0;
+}
+else {
+    if(player < player_count) {
+        player += 1;
+    }
+    else {player = 0;
+    }
+}
         turn_score = 0;
         reset_cubes();
         HelloApplication.can_roll = true;
     }
 
     public void tmp_dice_value() throws IOException {
-        evaluate_trow(dice_p_arr);
-        if (player == 1) {
-            total_score_1 += tmp_score;
-        } else {
-            total_score_2 += tmp_score;
-        }
+        evaluate_throw(dice_p_arr);
+
+            total_score[player]+=tmp_score;
         turn_score += tmp_score;
-        show_total_score(total_score_1, total_score_2);
+        show_total_score();
         dice_p_arr = new int[6];
     }
 
@@ -670,11 +700,12 @@ rot.play();
 
     }
     public void point_loss(int points){
+        if (against_bot){
         if (player == 1){
-            total_score_1 -= points;
+            total_score[0] -= points;
         }else {
-            total_score_2 -= points;
+            total_score[1] -= points;
         }
     }
-
+}
 }
