@@ -6,6 +6,7 @@ import javafx.application.Application;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point3D;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -85,47 +86,24 @@ public class HelloApplication extends Application {
                 } else {
                     player_count = Integer.parseInt(players_playing.getText());
                 }
-                Text[] texts = new Text[player_count + 1];
-                TextArea[] textAreas = new TextArea[player_count + 1];
-                VBox name_anchor = new VBox();
-                ScrollPane scroll_name = new ScrollPane();
-                for (int i = 0; i < player_count; i++) {
+                Text[] texts = new Text[player_count];
+                TextField[] textAreas = new TextField[player_count + 1];
+                StackPane text_holder = new StackPane();
+                VBox vbox = new VBox();
+                for (int i = 0; i < player_count-1; i++) {
                     texts[i] = new Text();
-                    textAreas[i] = new TextArea();
-                    textAreas[i].setTranslateX(150);
-                    textAreas[i].setMaxSize(200, 10);
+                    textAreas[i] = new TextField();
                     textAreas[i].setId(String.valueOf(i));
-                    texts[i].setTranslateX(100);
-                    texts[i].setTranslateY(30);
                     texts[i].setText("player" + i);
-
-                    name_anchor.getChildren().addAll(texts[i], textAreas[i]);
+                        VBox box = new VBox(texts[i],textAreas[i]);
+                        box.setAlignment(Pos.TOP_CENTER);
+                    vbox.getChildren().add(box);
                 }
-                Button name_but = new Button();
-                name_but.setOnMouseClicked(mouseEvent -> {
-                    for (int i = 0; i < player_count; i++) {
-                        player_names[i] = textAreas[i].getText();
-                    }
-                                  if (against_bot) {
-                                      try {
-                                          single_player();
-                                      } catch (IOException e) {
-                                          throw new RuntimeException(e);
-                                      }
-                                  }else {
-                                      try {
-                                          multi_player();
-                                      } catch (IOException e) {
-                                          throw new RuntimeException(e);
-                                      }
-                                  }
-                });
-                name_but.setText("start game");
-                name_anchor.getChildren().add(name_but);
-                scroll_name.setContent(name_anchor);
-                StackPane new_root = new StackPane();
-                new_root.getChildren().add(scroll_name);
-                Scene scene6 = new Scene(new_root, 1500, 1000);
+                VBox but_v = getvBox(textAreas);
+                vbox.getChildren().add(but_v);
+                but_v.setAlignment(Pos.BOTTOM_CENTER);
+                text_holder.getChildren().addAll(vbox);
+                Scene scene6 = new Scene(text_holder, 1500, 1000);
                 stage_true.setScene(scene6);
                 stage_true.show();
                 break;
@@ -396,6 +374,37 @@ public class HelloApplication extends Application {
         }
     }
 
+    private VBox getvBox(TextField[] textAreas) {
+        Button name_but = new Button();
+        name_but.setStyle("-fx-background:#b5b5b5;-fx-background-radius:10");
+        name_but.setOnMouseClicked(mouseEvent -> {
+            if (against_bot){
+                player_names[0]= textAreas[0].getText();
+                player_names[1] = "bot";
+            }else {
+                for (int i = 0; i < player_count; i++) {
+                    player_names[i] = textAreas[i].getText();
+                }
+            }
+                          if (against_bot) {
+                              try {
+                                  single_player();
+                              } catch (IOException e) {
+                                  throw new RuntimeException(e);
+                              }
+                          }else {
+                              try {
+                                  multi_player();
+                              } catch (IOException e) {
+                                  throw new RuntimeException(e);
+                              }
+                          }
+        });
+        name_but.setText("start game");
+        VBox but_v = new VBox(name_but);
+        return but_v;
+    }
+
     public void start_button() throws IOException {
         scene_manager(2, 0);
     }
@@ -429,7 +438,7 @@ public class HelloApplication extends Application {
     private void disable_dice(CuboidMesh mesh, int lock_value) throws IOException, InterruptedException {
         int cube = Integer.parseInt(mesh.getId());
         if (locked_dice[cube] == 0) {
-            can_roll = true;    
+            can_roll = true;
             remaining_cubes -= 1;
             offset_times += 1;
             mesh.setTranslateX(50 + 50 * offset_times);
@@ -699,7 +708,7 @@ public class HelloApplication extends Application {
 
     }
 
-    private void print_combination(int[] dice_values, boolean determines_roll, boolean end_turn) throws IOException, InterruptedException {
+    private void print_combination(int[] dice_values, boolean determines_roll, boolean end_turn) throws InterruptedException {
         StringBuilder combinations = new StringBuilder();
         int doubles = 0;
         int[] doubles_position = new int[6];
