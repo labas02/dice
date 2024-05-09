@@ -6,14 +6,14 @@
 
 <HBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.dice.HelloApplication">
    <children>
-       <BorderPane prefHeight="400.0" prefWidth="300.0" style="-fx-background-color: grey;" HBox.hgrow="ALWAYS">
+       <BorderPane prefHeight="400.0" prefWidth="300.0" HBox.hgrow="ALWAYS">
            <center>
-             <Button mnemonicParsing="false" onMouseClicked="#single_player" prefHeight="102.0" prefWidth="163.0" style="-fx-background-color: #b5b5b5; -fx-background-radius: 10;" text="singleplayer" BorderPane.alignment="CENTER" />
+             <Button mnemonicParsing="false" onMouseClicked="#single_player" prefHeight="68.0" prefWidth="146.0" text="singleplayer" BorderPane.alignment="CENTER" />
            </center>
        </BorderPane>
-       <BorderPane prefHeight="400.0" prefWidth="300.0" style="-fx-background-color: grey;" HBox.hgrow="ALWAYS">
+       <BorderPane prefHeight="400.0" prefWidth="300.0" HBox.hgrow="ALWAYS">
            <center>
-             <Button mnemonicParsing="false" onMouseClicked="#multi_player_options" prefHeight="87.0" prefWidth="145.0" style="-fx-background-color: #b5b5b5; -fx-background-radius: 10;" text="multiplayer" BorderPane.alignment="CENTER" />
+             <Button mnemonicParsing="false" onMouseClicked="#multi_player_options" prefHeight="69.0" prefWidth="122.0" text="multiplayer" BorderPane.alignment="CENTER" />
            </center>
        </BorderPane>
    </children>
