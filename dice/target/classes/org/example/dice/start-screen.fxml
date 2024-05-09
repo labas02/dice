@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 
 <HBox alignment="CENTER" prefHeight="420.0" prefWidth="559.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.dice.HelloApplication">
-   <GridPane prefHeight="420.0" prefWidth="1458.0">
+   <GridPane prefHeight="420.0" prefWidth="1458.0" style="-fx-background-color: grey;">
      <columnConstraints>
          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
          <ColumnConstraints hgrow="SOMETIMES" maxWidth="103.0" minWidth="10.0" prefWidth="77.0" />
@@ -17,14 +21,25 @@
        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
      </columnConstraints>
      <rowConstraints>
-       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+       <RowConstraints maxHeight="116.0" minHeight="10.0" prefHeight="87.0" vgrow="SOMETIMES" />
+       <RowConstraints maxHeight="245.0" minHeight="10.0" prefHeight="67.0" vgrow="SOMETIMES" />
+         <RowConstraints maxHeight="245.0" minHeight="10.0" prefHeight="138.0" vgrow="SOMETIMES" />
+         <RowConstraints maxHeight="98.0" minHeight="0.0" prefHeight="8.0" vgrow="SOMETIMES" />
+       <RowConstraints maxHeight="131.0" minHeight="10.0" prefHeight="131.0" vgrow="SOMETIMES" />
+         <RowConstraints maxHeight="112.0" minHeight="10.0" prefHeight="45.0" vgrow="SOMETIMES" />
      </rowConstraints>
       <children>
-         <Button fx:id="startButton" contentDisplay="CENTER" onMouseClicked="#start_button" prefHeight="138.0" prefWidth="191.0" text="start" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+         <Button fx:id="startButton" contentDisplay="CENTER" onMouseClicked="#start_button" prefHeight="115.0" prefWidth="226.0" style="-fx-background-color: #b5b5b5; -fx-background-radius: 10;" text="start" GridPane.columnIndex="2" GridPane.rowIndex="4" />
          <Label contentDisplay="CENTER" opacity="0.0" prefHeight="15.0" prefWidth="482.0" text="start menu" textFill="#171717" visible="false" GridPane.columnIndex="2" />
-         <Button fx:id="leaderboard" mnemonicParsing="false" onMouseClicked="#leaderboard" prefHeight="149.0" prefWidth="192.0" text="leaderboard" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+         <CheckBox fx:id="assist" mnemonicParsing="false" text="assist" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+         <RadioButton fx:id="gamemode1" mnemonicParsing="false" text="singleplayer" translateX="-25.0" GridPane.columnIndex="2" GridPane.rowIndex="2">
+            <toggleGroup>
+               <ToggleGroup fx:id="gamemode" />
+            </toggleGroup>
+         </RadioButton>
+         <RadioButton mnemonicParsing="false" prefHeight="30.0" prefWidth="118.0" selected="true" text="multiplayer" toggleGroup="$gamemode" translateX="100.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+         <TextField fx:id="players_playing" prefHeight="26.0" prefWidth="20.0" scaleX="0.5" translateX="80.0" translateY="40.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+         <Label text="player count (1-10)" translateY="40.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
       </children>
    </GridPane>
 </HBox>
