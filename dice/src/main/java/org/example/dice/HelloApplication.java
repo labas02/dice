@@ -496,6 +496,7 @@ public class HelloApplication extends Application {
             }
             rot.play();
             setEnd_turn(dice_values);
+            player = 0;
         }
     }
 
