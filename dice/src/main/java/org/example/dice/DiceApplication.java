@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Random;
 
-public class HelloApplication extends Application {
+public class DiceApplication extends Application {
 
     public TextField players_playing;
     boolean against_bot;
@@ -67,7 +67,7 @@ public class HelloApplication extends Application {
     public void scene_manager(int scene) throws IOException {
         switch (scene) {
             case 1:
-                FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("start-screen.fxml"));
+                FXMLLoader fxmlLoader = new FXMLLoader(DiceApplication.class.getResource("start-screen.fxml"));
                 Scene start_screen = new Scene(fxmlLoader.load(), 320, 240);
                 stage_true.setScene(start_screen);
                 stage_true.show();
@@ -145,7 +145,7 @@ public class HelloApplication extends Application {
 
                 but.setText("roll");
                 but.setOnMouseClicked(mouseEvent -> {
-                    if (can_roll) {
+                    if (can_roll && remaining_cubes != 0) {
                         can_roll = false;
                         try {
                             generate_values(boxes, transitionR, transitionT, assist.isSelected());
@@ -182,7 +182,6 @@ public class HelloApplication extends Application {
 
                 combination_text.setTranslateX(20);
                 combination_text.setTranslateY(50);
-                System.out.println(player_count);
                 AnchorPane[] player_box = new AnchorPane[player_count];
                 VBox players = new VBox();
                 players.setMaxSize(60, 60);
@@ -249,12 +248,11 @@ public class HelloApplication extends Application {
                 }
                 break;
             case 5:
-
+                assist_1 = assist.isSelected();
                 for (int i = 0; i < player_count; i++) {
                     total_score[i] = 0;
                     player_scores[i] = new Text();
                 }
-
                 for (int i = 0; i < boxes.length; i++) {
                     boxes[i] = new CuboidMesh(size, size, size);
                 }
@@ -273,7 +271,7 @@ public class HelloApplication extends Application {
 
                 but.setText("roll");
                 but.setOnMouseClicked(mouseEvent -> {
-                    if (can_roll) {
+                    if (can_roll && remaining_cubes != 0) {
                         can_roll = false;
                         try {
                             generate_values(boxes, transitionR, transitionT, assist.isSelected());
@@ -308,19 +306,20 @@ public class HelloApplication extends Application {
                     boxes[i].setTranslateX(40);
                 }
 
-
                 combination_text.setTranslateX(20);
                 combination_text.setTranslateY(50);
-                System.out.println(player_count);
                 player_box = new AnchorPane[player_count];
                 players = new VBox();
                 players.setMaxSize(60, 60);
                 leader_board = new ScrollPane();
                 leader_board.setMinSize(200, 200);
                 leader_board.setMaxSize(2000, 200);
+                leader_board.setBackground(new Background(new BackgroundFill(Color.GREY, null, null)));
                 leader_board.setTranslateX(800);
                 leader_board.setTranslateY(0);
                 leader_board.setStyle("-fx-background: grey; -fx-background-insets: 0; -fx-padding: 0;");
+                leader_board.setBorder(new Border(new BorderStroke(Color.BLACK,
+                        BorderStrokeStyle.SOLID, new CornerRadii(20), BorderWidths.DEFAULT)));
 
                 for (int i = 0; i < player_count; i++) {
                     player_scores[i] = new Text();
@@ -343,6 +342,7 @@ public class HelloApplication extends Application {
                     } catch (IOException | InterruptedException e) {
                         throw new RuntimeException(e);
                     }
+
                 });
 
                 end_turn.setTranslateY(20);
@@ -360,6 +360,7 @@ public class HelloApplication extends Application {
 
                 Scene scene5 = new Scene(root, 1500, 1000);
                 stage_true.setScene(scene5);
+                stage_true.setTitle("JavaFX 3D Example");
                 stage_true.show();
 
                 for (CuboidMesh mesh : boxes) {
@@ -375,13 +376,21 @@ public class HelloApplication extends Application {
             case 6:
                 Label winner = new Label();
                 Label winner_name = new Label();
+                Button main_menu = new Button();
+                main_menu.setOnMouseClicked(mouseEvent -> {
+                    try {
+                        scene_manager(1);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                main_menu.setTranslateY(100);
+                main_menu.setText("main menu");
                 winner.setText("winner:   ");
                 winner.setStyle("-fx-font-size:22");
                 winner_name.setTranslateX(50);
                 winner_name.setText(player_names[player]);
-                AnchorPane end_anchor = new AnchorPane();
-                StackPane root = new StackPane(winner,winner_name);
-                root.getChildren().add(end_anchor);
+                StackPane root = new StackPane(winner,winner_name,main_menu);
                 Scene end_screen = new Scene(root, 320, 240);
                 stage_true.setScene(end_screen);
                 stage_true.show();
@@ -391,13 +400,22 @@ public class HelloApplication extends Application {
                 VBox main_box = new VBox();
                 StackPane history_root = new StackPane();
                 Label history_label = new Label();
+                Button exit_button = new Button();
+                exit_button.setText("back");
+                exit_button.setStyle("-fx-background-color:#b5b5b5;-fx-font-size:22");
                 history_label.setStyle("-fx-font-size:22");
-                VBox v = new VBox(history_label);
+                exit_button.setOnMouseClicked(mouseEvent -> {
+                    try {
+                        scene_manager(1);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+                HBox v = new HBox(exit_button,history_label);
                 v.setAlignment(Pos.CENTER);
                 main_box.getChildren().add(v);
                 String csvFile = "history.csv";
                 String line;
-                String lastLine = null;
                 try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
                     while ((line = br.readLine()) != null) {
                         i++;
@@ -508,13 +526,13 @@ public class HelloApplication extends Application {
             mesh.setTranslateX(40);
             dice_p_arr[results[cube] - 1] -= 1;
         }
-        System.out.println(remaining_cubes);
     }
 
     public void show_total_score() throws IOException {
 
         for (int i = 0; i < player_count; i++) {
-            if (total_score[i] >= 10000) {
+            if (total_score[i] >= 1000) {
+                against_bot = false;
                 write_to_csv();
                 end_game();
             }
@@ -637,7 +655,6 @@ public class HelloApplication extends Application {
                 Random random = new Random();
                 int random1 = 1 + random.nextInt((6 - 1) + 1);
                 results[i] = random1;
-                //System.out.println(results[i]);
                 switch (random1) {
                     case 1:
                         matrixRotateNode(transitionRX[i], Math.toRadians(0), Math.toRadians(180), Math.toRadians(270));
@@ -712,17 +729,9 @@ public class HelloApplication extends Application {
 
             }
         }
-
-        for (int value : dice_values) {
-            System.out.println(value);
-        }
-
-        evaluate_throw(dice_values,2);
-
-
     }
 
-    public static int tmp_score;
+    public int tmp_score;
 
     private void evaluate_throw(int[] dice_values,int mode) {
 
@@ -847,7 +856,6 @@ public class HelloApplication extends Application {
         if (assist.isSelected()) {
             change_combination_text("combinations: "+combinations);
         }
-        System.out.println("final score: " + tmp_score);
 
     }
 
@@ -856,15 +864,15 @@ public class HelloApplication extends Application {
         evaluate_throw(dice_p_arr,1);
         turn_score += tmp_score;
         total_score[player] += tmp_score;
-        if (turn_score < 400||tmp_score == 0){
+        if (turn_score < 400 || tmp_score == 0){
             total_score[player] -= turn_score;
         }
-        if (remaining_cubes != 0 || tmp_score != 0){
-            show_total_score();
+        if (remaining_cubes != 0||tmp_score == 0){
             change_player();
             turn_score = 0;
-        }else {show_total_score();}
+        }
         reset_cubes();
+        show_total_score();
         tmp_score = 0;
         dice_p_arr = new int[6];
         can_roll = true;
@@ -900,11 +908,6 @@ public class HelloApplication extends Application {
                 dice_p_arr[5] += 1;
                 break;
         }
-
-        for (int value1 : dice_p_arr) {
-            System.out.println(value1);
-        }
-        evaluate_throw(dice_p_arr, 2);
 
     }
 
@@ -951,11 +954,7 @@ public class HelloApplication extends Application {
                 // Extracting the first column (index 0)
                 String firstColumn = parts[0];
 
-                System.out.println("First column from last line: " + firstColumn);
-                System.out.println(firstColumn);
                 return firstColumn;
-            } else {
-                System.out.println("File is empty");
             }
         } catch (IOException e) {
             e.printStackTrace();
