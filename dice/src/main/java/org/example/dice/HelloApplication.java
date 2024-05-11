@@ -19,7 +19,8 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.fxyz3d.shapes.primitives.CuboidMesh;
 
-import java.io.IOException;
+import java.io.*;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Random;
 
@@ -36,9 +37,9 @@ public class HelloApplication extends Application {
     public static Button but = new Button("roll");
     public static TranslateTransition[] transitionT = new TranslateTransition[6];
     public static RotateTransition[] transitionR = new RotateTransition[6];
-    public String[] player_names = new String[10];
-    public Text[] player_scores = new Text[10];
-    public int[] total_score = new int[10];
+    public String[] player_names = new String[99];
+    public Text[] player_scores = new Text[99];
+    public int[] total_score = new int[99];
     int size = 50;
     static Stage stage_true;
     static Text combination_text = new Text(" possible\n combinations:");
@@ -51,7 +52,6 @@ public class HelloApplication extends Application {
 
     public int offset_times = 0;
     public boolean can_roll = true;
-    public String winner_name;
 
 
     @Override
@@ -87,12 +87,22 @@ public class HelloApplication extends Application {
                 TextField[] textAreas = new TextField[player_count + 1];
                 StackPane text_holder = new StackPane();
                 VBox vbox = new VBox();
-                for (int i = 0; i < player_count; i++) {
+                if (!against_bot) {
+                    for (int i = 0; i < player_count; i++) {
+                        texts[i] = new Text();
+                        textAreas[i] = new TextField();
+                        textAreas[i].setId(String.valueOf(i));
+                        texts[i].setText("player" + i);
+                        VBox box = new VBox(texts[i], textAreas[i]);
+                        box.setAlignment(Pos.TOP_CENTER);
+                        vbox.getChildren().add(box);
+                    }
+                }else for (int i = 0; i < 2; i++) {
                     texts[i] = new Text();
                     textAreas[i] = new TextField();
                     textAreas[i].setId(String.valueOf(i));
                     texts[i].setText("player" + i);
-                    VBox box = new VBox(texts[i],textAreas[i]);
+                    VBox box = new VBox(texts[i], textAreas[i]);
                     box.setAlignment(Pos.TOP_CENTER);
                     vbox.getChildren().add(box);
                 }
@@ -103,6 +113,9 @@ public class HelloApplication extends Application {
                 Scene scene6 = new Scene(text_holder);
                 stage_true.setScene(scene6);
                 stage_true.show();
+                break;
+            case 3:
+
                 break;
             case 4:
                 player_names[1] = "bot";
@@ -155,6 +168,7 @@ public class HelloApplication extends Application {
                             throw new RuntimeException(e);
                         }
                     }
+                    evaluate_throw(dice_values,2);
                 });
 
                 for (CuboidMesh mesh : boxes) {
@@ -282,6 +296,7 @@ public class HelloApplication extends Application {
                             throw new RuntimeException(e);
                         }
                     }
+                    evaluate_throw(dice_values,2);
                 });
 
                 for (CuboidMesh mesh : boxes) {
@@ -345,7 +360,6 @@ public class HelloApplication extends Application {
 
                 Scene scene5 = new Scene(root, 1500, 1000);
                 stage_true.setScene(scene5);
-                stage_true.setTitle("JavaFX 3D Example");
                 stage_true.show();
 
                 for (CuboidMesh mesh : boxes) {
@@ -359,12 +373,63 @@ public class HelloApplication extends Application {
                 }
                 break;
             case 6:
-                FXMLLoader fxmlLoader3 = new FXMLLoader(HelloApplication.class.getResource("end-screen.fxml"));
-                Scene end_screen;
-                end_screen = new Scene(fxmlLoader3.load(), 320, 240);
+                Label winner = new Label();
+                Label winner_name = new Label();
+                winner.setText("winner:   ");
+                winner.setStyle("-fx-font-size:22");
+                winner_name.setTranslateX(50);
+                winner_name.setText(player_names[player]);
+                AnchorPane end_anchor = new AnchorPane();
+                StackPane root = new StackPane(winner,winner_name);
+                root.getChildren().add(end_anchor);
+                Scene end_screen = new Scene(root, 320, 240);
                 stage_true.setScene(end_screen);
                 stage_true.show();
-                winner.setText(winner_name);
+                break;
+            case 7:
+                int i = 0;
+                VBox main_box = new VBox();
+                StackPane history_root = new StackPane();
+                Label history_label = new Label();
+                history_label.setStyle("-fx-font-size:22");
+                VBox v = new VBox(history_label);
+                v.setAlignment(Pos.CENTER);
+                main_box.getChildren().add(v);
+                String csvFile = "history.csv";
+                String line;
+                String lastLine = null;
+                try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+                    while ((line = br.readLine()) != null) {
+                        i++;
+                        if (i>2) {
+                            i++;
+                            Label l1 = new Label();
+                            String[] parts = line.split(",");
+                            l1.setText("winner: " + parts[1] + " other players: " + parts[2] + " date: " + parts[3]);
+                            l1.setAlignment(Pos.CENTER);
+                            l1.setStyle("-fx-font-size:20");
+                            VBox tmp_box = new VBox(l1);
+                            tmp_box.setMinHeight(50);
+                            tmp_box.setAlignment(Pos.CENTER);
+                            tmp_box.setStyle("-fx-background-color:#b5b5b5;");
+
+                            main_box.getChildren().add(tmp_box);
+                        }
+                    }
+                }
+                ScrollPane scroll = new ScrollPane(main_box);
+                main_box.setStyle("-fx-background-color:grey");
+
+                scroll.setFitToHeight(true);
+                scroll.setFitToWidth(true);
+
+
+                history_label.setText("history of matches");
+                history_root.getChildren().add(scroll);
+                history_root.setStyle("-fx-background-color:grey");
+                Scene history = new Scene(history_root);
+                stage_true.setScene(history);
+                stage_true.show();
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + scene);
@@ -421,6 +486,9 @@ public class HelloApplication extends Application {
     public void end_game() throws IOException {
         scene_manager(6);
     }
+    public void history() throws IOException {
+        scene_manager(7);
+    }
 
 
     private void disable_dice(CuboidMesh mesh) throws IOException, InterruptedException {
@@ -446,8 +514,8 @@ public class HelloApplication extends Application {
     public void show_total_score() throws IOException {
 
         for (int i = 0; i < player_count; i++) {
-            if (total_score[i] > 1000) {
-                winner_name = player_names[player];
+            if (total_score[i] >= 10000) {
+                write_to_csv();
                 end_game();
             }
             player_scores[i].setText(player_names[i] + "  total score: " + total_score[i]);
@@ -476,13 +544,36 @@ public class HelloApplication extends Application {
 
         if (player == 1 && against_bot) {
             generate_values(boxes, transitionR, transitionT, assist.isSelected());
+
             RotateTransition rot = new RotateTransition();
             rot.setDuration(Duration.millis(2000));
             rot.setNode(boxes[1]);
             rot.setOnFinished(actionEvent -> {
+                for (CuboidMesh mesh:boxes){
+                    try {
+                        disable_dice(mesh);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                evaluate_throw(dice_p_arr,1);
+                total_score[player] += tmp_score;
+                tmp_score = 0;
+                turn_score = 0;
+
+                try {
+                    show_total_score();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+               change_player();
                 try {
                     reset_cubes();
-                } catch (IOException | InterruptedException e) {
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             });
@@ -493,8 +584,6 @@ public class HelloApplication extends Application {
                 }
             }
             rot.play();
-            setEnd_turn();
-            player = 0;
         }
     }
 
@@ -627,8 +716,8 @@ public class HelloApplication extends Application {
         for (int value : dice_values) {
             System.out.println(value);
         }
+
         evaluate_throw(dice_values,2);
-        //evaluate_trow(dice_values);
 
 
     }
@@ -636,6 +725,7 @@ public class HelloApplication extends Application {
     public static int tmp_score;
 
     private void evaluate_throw(int[] dice_values,int mode) {
+
         StringBuilder combinations = new StringBuilder();
         int doubles = 0;
         int[] doubles_position = new int[6];
@@ -754,27 +844,27 @@ public class HelloApplication extends Application {
             }
 
         }
-        if (assist_1) {
-            change_combination_text(combinations.toString());
+        if (assist.isSelected()) {
+            change_combination_text("combinations: "+combinations);
         }
         System.out.println("final score: " + tmp_score);
 
     }
 
     public void setEnd_turn() throws IOException, InterruptedException {
+        generate_values(boxes, transitionR, transitionT, assist.isSelected());
         evaluate_throw(dice_p_arr,1);
         turn_score += tmp_score;
         total_score[player] += tmp_score;
         if (turn_score < 400||tmp_score == 0){
             total_score[player] -= turn_score;
         }
-        if (remaining_cubes != 0 && tmp_score != 0){
+        if (remaining_cubes != 0 || tmp_score != 0){
+            show_total_score();
             change_player();
-        }
+            turn_score = 0;
+        }else {show_total_score();}
         reset_cubes();
-
-        show_total_score();
-        turn_score = 0;
         tmp_score = 0;
         dice_p_arr = new int[6];
         can_roll = true;
@@ -797,7 +887,7 @@ public class HelloApplication extends Application {
             case 2:
                 dice_p_arr[1] += 1;
                 break;
-            case 3:
+            case 3 :
                 dice_p_arr[2] += 1;
                 break;
             case 4:
@@ -814,13 +904,62 @@ public class HelloApplication extends Application {
         for (int value1 : dice_p_arr) {
             System.out.println(value1);
         }
-        evaluate_throw(dice_p_arr, 3);
+        evaluate_throw(dice_p_arr, 2);
 
     }
 
     public void change_player(){
-        if (player==player_count){
+        player += 1;
+        if (player == player_count){
             player = 0;
-        }else player += 1;
+        }
+    }
+
+    public void write_to_csv() throws IOException {
+        String other_players = "";
+        for (int i = 0; i < player_count; i++) {
+            if (player != i) {
+                other_players += player_names[i]+";";
+            }
+        }
+        String id = get_from_csv();
+        FileWriter fw = new FileWriter("history.csv", true);
+        BufferedWriter bw = new BufferedWriter(fw);
+        bw.newLine();
+        id= String.valueOf(Integer.parseInt(id)+1);
+        bw.write(id+",");
+        bw.write(player_names[player]+",");
+        bw.write(other_players+",");
+        bw.write(String.valueOf(LocalDateTime.now()));
+        bw.close();
+    }
+
+    public String get_from_csv() throws IOException {
+        String csvFile = "history.csv";
+        String line;
+        String lastLine = null;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+            while ((line = br.readLine()) != null) {
+                lastLine = line; // Store the last line
+            }
+
+            if (lastLine != null) {
+                // Split the last line by comma
+                String[] parts = lastLine.split(",");
+
+                // Extracting the first column (index 0)
+                String firstColumn = parts[0];
+
+                System.out.println("First column from last line: " + firstColumn);
+                System.out.println(firstColumn);
+                return firstColumn;
+            } else {
+                System.out.println("File is empty");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }

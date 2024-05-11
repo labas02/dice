@@ -5,6 +5,7 @@ module org.example.dice {
     requires java.desktop;
     requires javafx.media;
     requires json.simple;
+    requires com.opencsv;
 
 
     opens org.example.dice to javafx.fxml;
