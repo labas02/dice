@@ -21,6 +21,7 @@ import org.fxyz3d.shapes.primitives.CuboidMesh;
 
 import java.io.*;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Random;
 
@@ -45,6 +46,7 @@ public class DiceApplication extends Application {
     static Text combination_text = new Text(" possible\n combinations:");
     private int remaining_cubes = 6;
     public RadioButton gamemode1;
+    public boolean can_continue = true;
     @FXML
     CheckBox assist;
 
@@ -153,7 +155,7 @@ public class DiceApplication extends Application {
                 but.setText("roll");
                 but.setStyle("-fx-background-color:#b5b5b5");
                 but.setOnMouseClicked(mouseEvent -> {
-                    if (can_roll && remaining_cubes != 0) {
+                    if (can_roll && remaining_cubes != 0 && can_continue) {
                         can_roll = false;
                         try {
                             generate_values(boxes, transitionR, transitionT, assist.isSelected());
@@ -175,8 +177,9 @@ public class DiceApplication extends Application {
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
+                        evaluate_throw(dice_values,2);
                     }
-                    evaluate_throw(dice_values,2);
+
                 });
 
                 for (CuboidMesh mesh : boxes) {
@@ -217,12 +220,13 @@ public class DiceApplication extends Application {
 
                 anchor = new AnchorPane(boxes[0], boxes[1], boxes[2], boxes[3], boxes[4], boxes[5]);
                 end_turn.setOnMouseClicked(mouseEvent -> {
-                    try {
-                        setEnd_turn();
-                    } catch (IOException | InterruptedException e) {
-                        throw new RuntimeException(e);
+                    if (can_continue) {
+                        try {
+                            setEnd_turn();
+                        } catch (IOException | InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
-
                 });
 
 
@@ -285,7 +289,7 @@ public class DiceApplication extends Application {
                 but.setText("roll");
                 but.setStyle("-fx-background-color:#b5b5b5");
                 but.setOnMouseClicked(mouseEvent -> {
-                    if (can_roll && remaining_cubes != 0) {
+                    if (can_roll && remaining_cubes != 0 && can_continue) {
                         can_roll = false;
                         try {
                             generate_values(boxes, transitionR, transitionT, assist.isSelected());
@@ -307,8 +311,8 @@ public class DiceApplication extends Application {
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
+                        evaluate_throw(dice_values,2);
                     }
-                    evaluate_throw(dice_values,2);
                 });
 
                 for (CuboidMesh mesh : boxes) {
@@ -349,12 +353,13 @@ public class DiceApplication extends Application {
 
                 anchor = new AnchorPane(boxes[0], boxes[1], boxes[2], boxes[3], boxes[4], boxes[5]);
                 end_turn.setOnMouseClicked(mouseEvent -> {
+                    if (can_continue){
                     try {
                         setEnd_turn();
                     } catch (IOException | InterruptedException e) {
                         throw new RuntimeException(e);
                     }
-
+                    }
                 });
 
 
@@ -471,7 +476,7 @@ public class DiceApplication extends Application {
                 throw new IllegalStateException("Unexpected value: " + scene);
         }
     }
-
+//nastavuje vbox (intellij me donutilo)
     private VBox getvBox(TextField[] textAreas) {
         Button name_but = new Button();
         name_but.setStyle("-fx-background:#b5b5b5;-fx-background-radius:10");
@@ -544,12 +549,20 @@ public class DiceApplication extends Application {
             mesh.setTranslateX(40);
             dice_p_arr[results[cube] - 1] -= 1;
         }
+        for (int i:locked_dice){
+            if (i == 1){
+                can_roll = true;
+                break;
+            }else {
+                can_roll = false;
+            }
+        }
+        evaluate_throw(dice_p_arr,3);
     }
 
     public void show_total_score() throws IOException {
-
         for (int i = 0; i < player_count; i++) {
-            if (total_score[i] >= 1000) {
+            if (total_score[i] >= 10000) {
                 against_bot = false;
                 write_to_csv();
                 end_game();
@@ -608,6 +621,12 @@ public class DiceApplication extends Application {
                 } catch (IOException | InterruptedException e) {
                     throw new RuntimeException(e);
                 }
+                dice_p_arr = new int[6];
+                can_roll = true;
+                can_continue = true;
+                player = 0;
+                tmp_score = 0;
+                turn_score = 0;
             });
             for (int i = 0; i < 6; i++) {
                 if (locked_dice[i] == 0) {
@@ -626,8 +645,8 @@ public class DiceApplication extends Application {
     public int[] locked_dice = new int[6];
     public boolean assist_1;
     public int turn_score = 0;
-
-    public static void matrixRotateNode(RotateTransition n, double alf, double bet, double gam) {
+//vypocita rotaci kostek
+    public static void calculate_cube_rotation(RotateTransition n, double alf, double bet, double gam) {
         Random random = new Random();
 
         double A11 = Math.cos(alf) * Math.cos(gam);
@@ -671,13 +690,13 @@ public class DiceApplication extends Application {
                 results[i] = random1;
                 switch (random1) {
                     case 1:
-                        matrixRotateNode(transitionRX[i], Math.toRadians(0), Math.toRadians(180), Math.toRadians(270));
+                        calculate_cube_rotation(transitionRX[i], Math.toRadians(0), Math.toRadians(180), Math.toRadians(270));
                         break;
                     case 2:
-                        matrixRotateNode(transitionRX[i], Math.toRadians(0), Math.toRadians(90), Math.toRadians(0));
+                        calculate_cube_rotation(transitionRX[i], Math.toRadians(0), Math.toRadians(90), Math.toRadians(0));
                         break;
                     case 3:
-                        matrixRotateNode(transitionRX[i], Math.toRadians(0), Math.toRadians(0), Math.toRadians(180));
+                        calculate_cube_rotation(transitionRX[i], Math.toRadians(0), Math.toRadians(0), Math.toRadians(180));
                         break;
                     case 4:
                         //matrixRotateNode(transitionRX[i], Math.toRadians(0),Math.toRadians(360),Math.toRadians(360));
@@ -685,10 +704,10 @@ public class DiceApplication extends Application {
                         transitionRX[i].setByAngle(360 * (1 + random.nextInt(5)));
                         break;
                     case 5:
-                        matrixRotateNode(transitionRX[i], Math.toRadians(0), Math.toRadians(270), Math.toRadians(0));
+                        calculate_cube_rotation(transitionRX[i], Math.toRadians(0), Math.toRadians(270), Math.toRadians(0));
                         break;
                     case 6:
-                        matrixRotateNode(transitionRX[i], Math.toRadians(0), Math.toRadians(180), Math.toRadians(90));
+                        calculate_cube_rotation(transitionRX[i], Math.toRadians(0), Math.toRadians(180), Math.toRadians(90));
                         break;
                 }
             }
@@ -746,9 +765,13 @@ public class DiceApplication extends Application {
     }
 
     public int tmp_score;
-
+int[] backup = new int[6];
+//vyhodnoti hod nebo vypise combinace nebo ujistuhe ze neprabivaji kostky
     private void evaluate_throw(int[] dice_values,int mode) {
-
+        if (mode == 3) {
+            int[] backup = dice_values;
+            can_continue = true;
+        }
         StringBuilder combinations = new StringBuilder();
         int doubles = 0;
         int[] doubles_position = new int[6];
@@ -765,6 +788,10 @@ public class DiceApplication extends Application {
                     combinations.append("1 + 2 + 3 + 4 + 5 + 6: 3000\n");
                     break;
                 case 3:
+                    tmp_score += 3000;
+                    for (int value : dice_values) {
+                        value = 0;
+                    }
                     break;
             }
 
@@ -790,6 +817,11 @@ public class DiceApplication extends Application {
                     combinations.append("3 doubles: 1500\n");
                     break;
                 case 3:
+                    tmp_score += 1500;
+                    for (int i = 0; i < doubles_position.length; i++) {
+                        dice_values[i] -= 2;
+                        doubles_position[i] -= 2;
+                    }
                     break;
             }
 
@@ -804,6 +836,8 @@ public class DiceApplication extends Application {
                     combinations.append("1 + 1 + 1: 1000\n");
                     break;
                 case 3:
+                    tmp_score += 1000;
+                    dice_values[0] -= 3;
                     break;
             }
 
@@ -833,6 +867,15 @@ public class DiceApplication extends Application {
                 }
                     break;
                 case 3:
+                    if (i != 0) {
+                        if (dice_values[i] == 6) {
+                            tmp_score += 200 * (i + 1);
+                            dice_values[i] = 0;
+                        } else if (dice_values[i] >= 3) {
+                            tmp_score += 100 * (i + 1);
+                            dice_values[i] -= 3;
+                        }
+                    }
                     break;
             }
 
@@ -848,6 +891,8 @@ public class DiceApplication extends Application {
                     combinations.append("number 1:").append(100 * dice_values[0]).append("\n");
                     break;
                 case 3:
+                    tmp_score += 100 * dice_values[0];
+                    dice_values[0] = 0;
                     break;
             }
 
@@ -863,16 +908,37 @@ public class DiceApplication extends Application {
                     combinations.append("number 5:").append(50 * dice_values[4]).append("\n");
                     break;
                 case 3:
+                    tmp_score += 50 * dice_values[4];
+                    dice_values[4] = 0;
                     break;
             }
 
         }
-        if (assist.isSelected()) {
+        if (mode == 3){
+            System.out.println(Arrays.toString(dice_values));
+            System.out.println(Arrays.toString(backup));
+            for (int value:dice_values){
+                if (value<0){
+                    value = 0;
+                }
+                if (value > 0){
+                    can_continue = false;
+
+                    break;
+                }
+                else {
+                    can_continue = true;
+                }
+            }
+            dice_values = backup;
+        }
+
+        if (assist.isSelected() && mode == 2) {
             change_combination_text("combinations: \n"+combinations);
         }
 
     }
-
+//konec tahu
     public void setEnd_turn() throws IOException, InterruptedException {
         generate_values(boxes, transitionR, transitionT, assist.isSelected());
         evaluate_throw(dice_p_arr,1);
@@ -891,7 +957,7 @@ public class DiceApplication extends Application {
         dice_p_arr = new int[6];
         can_roll = true;
     }
-
+//mezi tah
     public void tmp_dice_value() throws IOException {
         evaluate_throw(dice_p_arr,1);
             turn_score += tmp_score;
