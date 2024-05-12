@@ -54,6 +54,7 @@ public class DiceApplication extends Application {
     public boolean can_roll = true;
 
 
+
     @Override
     public void start(Stage stage) throws IOException {
         stage_true = stage;
@@ -108,7 +109,7 @@ public class DiceApplication extends Application {
                     vbox.getChildren().add(box);
                 }
                 VBox but_v = getvBox(textAreas);
-                but_v.setStyle("-fx-background-color:#b5b5b5");
+                but_v.setStyle("-fx-background-color:grey");
                 vbox.getChildren().add(but_v);
                 but_v.setAlignment(Pos.BOTTOM_CENTER);
                 text_holder.getChildren().addAll(vbox);
@@ -547,7 +548,6 @@ public class DiceApplication extends Application {
     }
 
     public void show_total_score() throws IOException {
-
         for (int i = 0; i < player_count; i++) {
             if (total_score[i] >= 1000) {
                 against_bot = false;
@@ -881,12 +881,12 @@ public class DiceApplication extends Application {
         if (turn_score < 400 || tmp_score == 0){
             total_score[player] -= turn_score;
         }
+        show_total_score();
         if (remaining_cubes != 0||tmp_score == 0){
             change_player();
             turn_score = 0;
         }
         reset_cubes();
-        show_total_score();
         tmp_score = 0;
         dice_p_arr = new int[6];
         can_roll = true;
