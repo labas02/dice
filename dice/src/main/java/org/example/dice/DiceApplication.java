@@ -155,7 +155,7 @@ public class DiceApplication extends Application {
                 but.setText("roll");
                 but.setStyle("-fx-background-color:#b5b5b5");
                 but.setOnMouseClicked(mouseEvent -> {
-                    if (can_roll && remaining_cubes != 0 && can_continue) {
+                    if (can_roll && can_continue && remaining_cubes != 0) {
                         can_roll = false;
                         try {
                             generate_values(boxes, transitionR, transitionT, assist.isSelected());
@@ -179,7 +179,6 @@ public class DiceApplication extends Application {
                         }
                         evaluate_throw(dice_values,2);
                     }
-
                 });
 
                 for (CuboidMesh mesh : boxes) {
@@ -289,7 +288,7 @@ public class DiceApplication extends Application {
                 but.setText("roll");
                 but.setStyle("-fx-background-color:#b5b5b5");
                 but.setOnMouseClicked(mouseEvent -> {
-                    if (can_roll && remaining_cubes != 0 && can_continue) {
+                    if (can_roll && can_continue && remaining_cubes != 0) {
                         can_roll = false;
                         try {
                             generate_values(boxes, transitionR, transitionT, assist.isSelected());
@@ -556,13 +555,15 @@ public class DiceApplication extends Application {
             }else {
                 can_roll = false;
             }
+            
         }
-        evaluate_throw(dice_p_arr,3);
+       // evaluate_throw(dice_p_arr,3);
     }
 
     public void show_total_score() throws IOException {
         for (int i = 0; i < player_count; i++) {
-            if (total_score[i] >= 10000) {
+            if (total_score[i] >= 1000) {
+                end = true;
                 against_bot = false;
                 write_to_csv();
                 end_game();
@@ -788,7 +789,8 @@ public class DiceApplication extends Application {
                     combinations.append("1 + 2 + 3 + 4 + 5 + 6: 3000\n");
                     break;
                 case 3:
-                    tmp_score += 3000;
+                    System.out.println("postupka");
+                    can_continue = true;
                     for (int value : dice_values) {
                         value = 0;
                     }
@@ -817,16 +819,20 @@ public class DiceApplication extends Application {
                     combinations.append("3 doubles: 1500\n");
                     break;
                 case 3:
-                    tmp_score += 1500;
+                    System.out.println("3 doubles");
                     for (int i = 0; i < doubles_position.length; i++) {
                         dice_values[i] -= 2;
                         doubles_position[i] -= 2;
+                    }
+                    for (int i:dice_values){
+                        i = 0;
                     }
                     break;
             }
 
         }
-        if (dice_values[0] == 3) {
+
+        if (dice_values[0] >= 3) {
             switch(mode){
                 case 1:
                     tmp_score += 1000;
@@ -836,12 +842,12 @@ public class DiceApplication extends Application {
                     combinations.append("1 + 1 + 1: 1000\n");
                     break;
                 case 3:
-                    tmp_score += 1000;
                     dice_values[0] -= 3;
                     break;
             }
 
         }
+
         //100*dice points
         for (int i = 0; i < dice_values.length; i++) {
             switch(mode){
@@ -869,10 +875,8 @@ public class DiceApplication extends Application {
                 case 3:
                     if (i != 0) {
                         if (dice_values[i] == 6) {
-                            tmp_score += 200 * (i + 1);
                             dice_values[i] = 0;
                         } else if (dice_values[i] >= 3) {
-                            tmp_score += 100 * (i + 1);
                             dice_values[i] -= 3;
                         }
                     }
@@ -938,6 +942,7 @@ public class DiceApplication extends Application {
         }
 
     }
+    public boolean end = false;
     //konec tahu
     public void setEnd_turn() throws IOException, InterruptedException {
         generate_values(boxes, transitionR, transitionT, assist.isSelected());
@@ -947,12 +952,12 @@ public class DiceApplication extends Application {
         if (turn_score < 400 || tmp_score == 0){
             total_score[player] -= turn_score;
         }
-        if (remaining_cubes != 0||tmp_score == 0){
+        show_total_score();
+        if (remaining_cubes != 0||tmp_score == 0 && !end){
             change_player();
             turn_score = 0;
         }
         reset_cubes();
-        show_total_score();
         tmp_score = 0;
         dice_p_arr = new int[6];
         can_roll = true;
