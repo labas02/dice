@@ -354,11 +354,11 @@ public class DiceApplication extends Application {
                 anchor = new AnchorPane(boxes[0], boxes[1], boxes[2], boxes[3], boxes[4], boxes[5]);
                 end_turn.setOnMouseClicked(mouseEvent -> {
                     if (can_continue){
-                    try {
-                        setEnd_turn();
-                    } catch (IOException | InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
+                        try {
+                            setEnd_turn();
+                        } catch (IOException | InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
                 });
 
@@ -476,7 +476,7 @@ public class DiceApplication extends Application {
                 throw new IllegalStateException("Unexpected value: " + scene);
         }
     }
-//nastavuje vbox (intellij me donutilo)
+    //nastavuje vbox (intellij me donutilo)
     private VBox getvBox(TextField[] textAreas) {
         Button name_but = new Button();
         name_but.setStyle("-fx-background:#b5b5b5;-fx-background-radius:10");
@@ -615,7 +615,7 @@ public class DiceApplication extends Application {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-               change_player();
+                change_player();
                 try {
                     reset_cubes();
                 } catch (IOException | InterruptedException e) {
@@ -645,7 +645,7 @@ public class DiceApplication extends Application {
     public int[] locked_dice = new int[6];
     public boolean assist_1;
     public int turn_score = 0;
-//vypocita rotaci kostek
+    //vypocita rotaci kostek
     public static void calculate_cube_rotation(RotateTransition n, double alf, double bet, double gam) {
         Random random = new Random();
 
@@ -765,8 +765,8 @@ public class DiceApplication extends Application {
     }
 
     public int tmp_score;
-int[] backup = new int[6];
-//vyhodnoti hod nebo vypise combinace nebo ujistuhe ze neprabivaji kostky
+    int[] backup = new int[6];
+    //vyhodnoti hod nebo vypise combinace nebo ujistuhe ze neprabivaji kostky
     private void evaluate_throw(int[] dice_values,int mode) {
         if (mode == 3) {
             int[] backup = dice_values;
@@ -858,13 +858,13 @@ int[] backup = new int[6];
                     break;
                 case 2:
                     if (i != 0) {
-                    if (dice_values[i] == 6) {
-                        combinations.append("2 three numbers:").append(200 * (i + 1)).append("\n");
-                    } else if (dice_values[i] >= 3) {
-                        combinations.append("three numbers:").append(100 * (i + 1)).append("\n");
+                        if (dice_values[i] == 6) {
+                            combinations.append("2 three numbers:").append(200 * (i + 1)).append("\n");
+                        } else if (dice_values[i] >= 3) {
+                            combinations.append("three numbers:").append(100 * (i + 1)).append("\n");
 
+                        }
                     }
-                }
                     break;
                 case 3:
                     if (i != 0) {
@@ -938,7 +938,7 @@ int[] backup = new int[6];
         }
 
     }
-//konec tahu
+    //konec tahu
     public void setEnd_turn() throws IOException, InterruptedException {
         generate_values(boxes, transitionR, transitionT, assist.isSelected());
         evaluate_throw(dice_p_arr,1);
@@ -957,12 +957,12 @@ int[] backup = new int[6];
         dice_p_arr = new int[6];
         can_roll = true;
     }
-//mezi tah
+    //mezi tah
     public void tmp_dice_value() throws IOException {
         evaluate_throw(dice_p_arr,1);
-            turn_score += tmp_score;
-            total_score[player] += tmp_score;
-            tmp_score = 0;
+        turn_score += tmp_score;
+        total_score[player] += tmp_score;
+        tmp_score = 0;
         show_total_score();
         for (int i = 0;i<locked_dice.length;i++){
             if (locked_dice[i]==1){
