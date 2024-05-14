@@ -9,6 +9,7 @@ import javafx.geometry.Point3D;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -59,6 +60,8 @@ public class DiceApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         stage_true = stage;
+        stage_true.setTitle("dice game");
+        stage_true.getIcons().add(new Image(getClass().getResourceAsStream("icon.png")));
         scene_manager(1);
     }
 
@@ -562,7 +565,7 @@ public class DiceApplication extends Application {
 
     public void show_total_score() throws IOException {
         for (int i = 0; i < player_count; i++) {
-            if (total_score[i] >= 1000) {
+            if (total_score[i] >= 10000) {
                 end = true;
                 against_bot = false;
                 write_to_csv();
